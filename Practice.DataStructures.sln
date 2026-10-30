@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A9026D4B-397E-4AC3-91D9-66237F6671FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5112E17B-7D08-4B54-AB87-09F0C8175C00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Practice.DataStructures.Core", "src\Practice.DataStructures.Core\Practice.DataStructures.Core.csproj", "{B4F23963-02DE-41A7-979F-CD04C714DF54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Practice.DataStructures.Tests", "tests\Practice.DataStructures.Tests\Practice.DataStructures.Tests.csproj", "{07D1383B-74E7-4CF5-86B8-ED108A7E0046}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4F23963-02DE-41A7-979F-CD04C714DF54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4F23963-02DE-41A7-979F-CD04C714DF54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4F23963-02DE-41A7-979F-CD04C714DF54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4F23963-02DE-41A7-979F-CD04C714DF54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07D1383B-74E7-4CF5-86B8-ED108A7E0046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07D1383B-74E7-4CF5-86B8-ED108A7E0046}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07D1383B-74E7-4CF5-86B8-ED108A7E0046}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07D1383B-74E7-4CF5-86B8-ED108A7E0046}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B4F23963-02DE-41A7-979F-CD04C714DF54} = {A9026D4B-397E-4AC3-91D9-66237F6671FA}
+		{07D1383B-74E7-4CF5-86B8-ED108A7E0046} = {5112E17B-7D08-4B54-AB87-09F0C8175C00}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,18 @@
+# Build output and test results.
+**/[Bb]in/
+**/[Oo]bj/
+artifacts/
+**/TestResults/
+
+# Local IDE state.
+.idea/
+.vs/
+.vscode/
+*.suo
+*.user
+*.DotSettings.user
+
+# Operating system files.
+.DS_Store
+Thumbs.db
+Desktop.ini
