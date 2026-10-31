@@ -188,6 +188,131 @@ public sealed class DynamicArrayInvalidationTests
     }
 
     [Theory]
+    [InlineData(1, 0, 0)]
+    [InlineData(1, 0, 1)]
+    [InlineData(1, 0, 2)]
+    [InlineData(3, 0, 0)]
+    [InlineData(3, 1, 1)]
+    [InlineData(3, 2, 3)]
+    [InlineData(3, 1, 4)]
+    public void RemoveAt_EnumeratorInAnyPosition_InvalidatesMoveNextAndCurrent(int count, int index, int advanceCount)
+    {
+        // Arrange
+        var array = new DynamicArray<int>();
+        for (int item = 1; item <= count; item++)
+        {
+            array.Add(item);
+        }
+
+        using IEnumerator<int> iterator = array.GetEnumerator();
+        for (int step = 0; step < advanceCount; step++)
+        {
+            Assert.Equal(step < count, iterator.MoveNext());
+        }
+
+        // Act
+        array.RemoveAt(index);
+
+        // Assert
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            iterator.MoveNext();
+        });
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = iterator.Current;
+        });
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = ((IEnumerator)iterator).Current;
+        });
+    }
+
+    [Fact]
+    public void RemoveAt_NonGenericEnumerator_InvalidatesMoveNextAndCurrent()
+    {
+        // Arrange
+        var array = new DynamicArray<int> { 10, 20 };
+        IEnumerator iterator = ((IEnumerable)array).GetEnumerator();
+        using var resource = iterator as IDisposable;
+        Assert.True(iterator.MoveNext());
+
+        // Act
+        array.RemoveAt(1);
+
+        // Assert
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            iterator.MoveNext();
+        });
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = iterator.Current;
+        });
+    }
+
+    [Theory]
+    [InlineData(0, 0, -1)]
+    [InlineData(0, 1, 0)]
+    [InlineData(3, 0, -1)]
+    [InlineData(3, 1, 3)]
+    [InlineData(3, 3, int.MaxValue)]
+    [InlineData(3, 4, int.MinValue)]
+    public void RemoveAt_InvalidIndex_PreservesEnumeratorState(int count, int advanceCount, int invalidIndex)
+    {
+        // Arrange
+        int[] expected = [.. Enumerable.Range(1, count)];
+        var array = new DynamicArray<int>();
+        foreach (int item in expected)
+        {
+            array.Add(item);
+        }
+
+        using IEnumerator<int> iterator = array.GetEnumerator();
+        IEnumerator nonGenericIterator = ((IEnumerable)array).GetEnumerator();
+        using var resource = nonGenericIterator as IDisposable;
+        for (int step = 0; step < advanceCount; step++)
+        {
+            Assert.Equal(step < count, iterator.MoveNext());
+            Assert.Equal(step < count, nonGenericIterator.MoveNext());
+        }
+
+        // Act
+        Exception? exception = Record.Exception(() => array.RemoveAt(invalidIndex));
+
+        // Assert
+        ArgumentOutOfRangeException argumentException = Assert.IsType<ArgumentOutOfRangeException>(exception);
+        Assert.Equal("index", argumentException.ParamName);
+        if (advanceCount > 0 && advanceCount <= count)
+        {
+            Assert.Equal(expected[advanceCount - 1], iterator.Current);
+            Assert.Equal(expected[advanceCount - 1], Assert.IsType<int>(nonGenericIterator.Current));
+        }
+        else
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                _ = iterator.Current;
+            });
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                _ = nonGenericIterator.Current;
+            });
+        }
+
+        for (int remainingIndex = advanceCount; remainingIndex < count; remainingIndex++)
+        {
+            Assert.True(iterator.MoveNext());
+            Assert.True(nonGenericIterator.MoveNext());
+            Assert.Equal(expected[remainingIndex], iterator.Current);
+            Assert.Equal(expected[remainingIndex], Assert.IsType<int>(nonGenericIterator.Current));
+        }
+
+        Assert.False(iterator.MoveNext());
+        Assert.False(nonGenericIterator.MoveNext());
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public void Current_OutsideActivePosition_ThrowsInvalidOperationException(bool completeEnumeration)

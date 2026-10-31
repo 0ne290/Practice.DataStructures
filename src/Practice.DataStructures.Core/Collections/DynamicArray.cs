@@ -3,7 +3,7 @@ using System.Collections;
 namespace Practice.DataStructures.Core.Collections;
 
 /// <summary>
-/// Динамический массив с добавлением в конец, доступом по индексу и перебором элементов.
+/// Динамический массив с добавлением в конец, доступом и удалением по индексу и перебором элементов.
 /// </summary>
 /// <typeparam name="T">Тип хранимых элементов.</typeparam>
 /// <remarks>
@@ -113,6 +113,42 @@ public sealed class DynamicArray<T> : IEnumerable<T>
         _version = unchecked(_version + 1);
     }
 
+    /// <summary>Удаляет элемент по индексу, сохраняя порядок остальных элементов.</summary>
+    /// <param name="index">Индекс удаляемого элемента от нуля до <see cref="Count"/> минус один.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="index"/> отрицателен или не меньше <see cref="Count"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    /// Успешное удаление уменьшает <see cref="Count"/> на один и сохраняет
+    /// <see cref="Capacity"/>, в том числе при удалении единственного элемента.
+    /// Освободившаяся ячейка хранилища получает значение по умолчанию для
+    /// <typeparamref name="T"/>, чтобы не удерживать лишние ссылки.
+    /// </para>
+    /// <para>
+    /// Удаление инвалидирует ранее полученные перечислители по правилам
+    /// <see cref="GetEnumerator"/>. Недопустимый индекс не меняет содержимое,
+    /// количество элементов, вместимость и состояние перечислителей.
+    /// </para>
+    /// <para>
+    /// Сложность в худшем случае — <c>O(n)</c>, где <c>n</c> — текущее количество
+    /// элементов; удаление последнего элемента — <c>O(1)</c>.
+    /// Дополнительная память — <c>O(1)</c>.
+    /// </para>
+    /// </remarks>
+    public void RemoveAt(int index)
+    {
+        if (index < 0 || index >= Count)
+            throw new ArgumentOutOfRangeException(nameof(index), index, "Index must refer to an existing element.");
+
+        for (var i = index; i < Count - 1; i++)
+            _array[i] = _array[i + 1];
+        Array.Clear(_array, Count - 1, 1);
+
+        Count--;
+        _version = unchecked(_version + 1);
+    }
+
     /// <summary>Создаёт новый перечислитель элементов в порядке индексов.</summary>
     /// <returns>Перечислитель, расположенный перед первым элементом.</returns>
     /// <remarks>
@@ -123,11 +159,11 @@ public sealed class DynamicArray<T> : IEnumerable<T>
     /// </para>
     /// <para>
     /// Версия списка фиксируется при получении перечислителя.
-    /// Успешный <see cref="Add"/> или запись через индексатор, включая запись того же значения,
+    /// Успешный вызов <see cref="Add"/>, <see cref="RemoveAt"/> или запись через индексатор, включая запись того же значения,
     /// инвалидирует ранее полученные перечислители. Их <see cref="IEnumerator.MoveNext"/>
     /// и <see cref="IEnumerator{T}.Current"/> после этого выбрасывают
     /// <see cref="InvalidOperationException"/>, в том числе до первого шага и после завершения обхода.
-    /// Чтение и отклонённая запись сохраняют работоспособность перечислителя.
+    /// Чтение, отклонённая запись и удаление по недопустимому индексу сохраняют работоспособность перечислителя.
     /// </para>
     /// <para>
     /// <see cref="IEnumerator{T}.Current"/> до первого успешного шага, после завершения

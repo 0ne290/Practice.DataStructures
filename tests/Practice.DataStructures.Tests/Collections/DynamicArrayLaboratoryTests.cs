@@ -15,6 +15,7 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         const int initialCapacity = 2;
         const int itemCount = 24;
         const int replacementCount = 5;
+        const int removalCount = 5;
         const int minimumValue = -9;
         const int maximumValue = 9;
 
@@ -30,8 +31,8 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         }
 
         string seedSource = suppliedSeed is null ? "новый случайный" : seedEnvironmentVariable;
-        output.WriteLine("DynamicArray<int>: добавление, рост, перебор, чтение и замена");
-        output.WriteLine($"Seed={seed} ({seedSource}); начальная вместимость={initialCapacity}; элементов={itemCount}; замен={replacementCount}");
+        output.WriteLine("DynamicArray<int>: добавление, рост, перебор, чтение, замена и удаление");
+        output.WriteLine($"Seed={seed} ({seedSource}); начальная вместимость={initialCapacity}; элементов={itemCount}; замен={replacementCount}; случайных удалений={removalCount}");
         output.WriteLine($"Повторить этот прогон: --environment {seedEnvironmentVariable}={seed}");
         output.WriteLine($"Диапазон значений: [{minimumValue}, {maximumValue}]; значения для замены: [100, 199]");
 
@@ -152,9 +153,60 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(expected, freshPass);
         output.WriteLine($"Новый обход работает: [{string.Join(", ", freshPass)}]");
 
+        // Act / Assert: удаление по случайным индексам с сохранением порядка.
+        output.WriteLine("");
+        output.WriteLine("6. Удаляем элементы по случайным индексам");
+        var removalReference = new List<int>(expected);
+        int capacityBeforeRemoval = array.Capacity;
+        for (int removal = 0; removal < removalCount; removal++)
+        {
+            int index = random.Next(array.Count);
+            int removedValue = array[index];
+            using IEnumerator<int> iterator = array.GetEnumerator();
+            Assert.True(iterator.MoveNext());
+
+            array.RemoveAt(index);
+            removalReference.RemoveAt(index);
+
+            Assert.Equal(removalReference.Count, array.Count);
+            Assert.Equal(capacityBeforeRemoval, array.Capacity);
+            Assert.Equal(removalReference, array);
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                iterator.MoveNext();
+            });
+            output.WriteLine($"RemoveAt({index}): удалено {removedValue}; Count={array.Count}, Capacity={array.Capacity}; старый обход инвалидирован.");
+            output.WriteLine($"Осталось: [{string.Join(", ", array)}]");
+        }
+
+        // Act / Assert: удаление всех элементов не меняет вместимость.
+        output.WriteLine("");
+        output.WriteLine("7. Удаляем оставшиеся элементы с конца и используем массив повторно");
+        while (removalReference.Count > 0)
+        {
+            int lastIndex = removalReference.Count - 1;
+            array.RemoveAt(lastIndex);
+            removalReference.RemoveAt(lastIndex);
+
+            Assert.Equal(removalReference.Count, array.Count);
+            Assert.Equal(capacityBeforeRemoval, array.Capacity);
+            Assert.Equal(removalReference, array);
+        }
+
+        Assert.Empty(array);
+        output.WriteLine($"Все элементы удалены: Count={array.Count}, Capacity={array.Capacity}");
+        int reusedValue = random.Next(minimumValue, maximumValue + 1);
+        array.Add(reusedValue);
+        removalReference.Add(reusedValue);
+        Assert.Equal(1, array.Count);
+        Assert.Equal(capacityBeforeRemoval, array.Capacity);
+        Assert.Equal(reusedValue, array[0]);
+        Assert.Equal(removalReference, array);
+        output.WriteLine($"Add({reusedValue}): Count={array.Count}, Capacity={array.Capacity}; массив снова используется.");
+
         // Act / Assert: ожидаемые ошибки аргументов.
         output.WriteLine("");
-        output.WriteLine("6. Проверяем недопустимые аргументы");
+        output.WriteLine("8. Проверяем недопустимые аргументы");
         ArgumentOutOfRangeException capacityException = Assert.Throws<ArgumentOutOfRangeException>(
             "capacity", () => new DynamicArray<int>(0));
         output.WriteLine($"Вместимость 0: {capacityException.GetType().Name}, параметр '{capacityException.ParamName}'");
@@ -164,6 +216,17 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
             _ = array[array.Count];
         });
         output.WriteLine($"Индекс Count ({array.Count}): {indexException.GetType().Name}, параметр '{indexException.ParamName}'");
+
+        using IEnumerator<int> preservedIterator = array.GetEnumerator();
+        Assert.True(preservedIterator.MoveNext());
+        ArgumentOutOfRangeException removalException = Assert.Throws<ArgumentOutOfRangeException>(
+            "index", () => array.RemoveAt(array.Count));
+        Assert.Equal(reusedValue, preservedIterator.Current);
+        Assert.False(preservedIterator.MoveNext());
+        Assert.Equal(1, array.Count);
+        Assert.Equal(capacityBeforeRemoval, array.Capacity);
+        Assert.Equal(removalReference, array);
+        output.WriteLine($"RemoveAt(Count): {removalException.GetType().Name}, параметр '{removalException.ParamName}'; содержимое и старый обход сохранились.");
         output.WriteLine("");
         output.WriteLine("Эксперимент завершён. Все проверки пройдены.");
     }
