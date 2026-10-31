@@ -12,6 +12,9 @@ artifacts/
 *.user
 *.DotSettings.user
 
+# Machine-specific environment cache.
+/environment.local.json
+
 # Operating system files.
 .DS_Store
 Thumbs.db

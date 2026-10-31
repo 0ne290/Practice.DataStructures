@@ -13,4 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Practice.DataStructures.Core/Practice.DataStructures.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Collections/" />
+  </ItemGroup>
 </Project>
