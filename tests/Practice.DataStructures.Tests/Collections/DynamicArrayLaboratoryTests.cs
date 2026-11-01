@@ -228,6 +228,58 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(removalReference, array);
         output.WriteLine($"RemoveAt(Count): {removalException.GetType().Name}, параметр '{removalException.ParamName}'; содержимое и старый обход сохранились.");
         output.WriteLine("");
+        // Act / Assert: поиск первого совпадения сохраняет обход.
+        output.WriteLine("9. Ищем значения среди дубликатов");
+        array.Add(reusedValue);
+        using (IEnumerator<int> iterator = array.GetEnumerator())
+        {
+            Assert.True(iterator.MoveNext());
+            int foundIndex = array.IndexOf(reusedValue);
+            bool found = array.Contains(reusedValue);
+            Assert.Equal(0, foundIndex);
+            Assert.True(found);
+            Assert.Equal(-1, array.IndexOf(int.MaxValue));
+            Assert.False(array.Contains(int.MaxValue));
+            Assert.Equal(reusedValue, iterator.Current);
+            Assert.True(iterator.MoveNext());
+            Assert.Equal(reusedValue, iterator.Current);
+            Assert.False(iterator.MoveNext());
+            output.WriteLine($"IndexOf({reusedValue})={foundIndex}, Contains={found}; отсутствующее значение={int.MaxValue}; обход сохранился.");
+        }
+
+        Assert.Equal(new[] { reusedValue, reusedValue }, array);
+        Assert.Equal(2, array.Count);
+        Assert.Equal(capacityBeforeRemoval, array.Capacity);
+
+        // Act / Assert: очистка и повторное использование.
+        output.WriteLine("");
+        output.WriteLine("10. Очищаем массив с сохранением вместимости");
+        using (IEnumerator<int> iterator = array.GetEnumerator())
+        {
+            array.Clear();
+            Assert.Throws<InvalidOperationException>(() => iterator.MoveNext());
+        }
+
+        Assert.Equal(0, array.Count);
+        Assert.Empty(array);
+        Assert.Equal(capacityBeforeRemoval, array.Capacity);
+        Assert.Equal(-1, array.IndexOf(reusedValue));
+        Assert.False(array.Contains(reusedValue));
+        output.WriteLine($"Clear(): Count={array.Count}, Capacity={array.Capacity}; прежнее значение отсутствует, старый обход инвалидирован.");
+        using (IEnumerator<int> iterator = array.GetEnumerator())
+        {
+            array.Clear();
+            Assert.Throws<InvalidOperationException>(() => iterator.MoveNext());
+        }
+
+        Assert.Equal(0, array.Count);
+        Assert.Equal(capacityBeforeRemoval, array.Capacity);
+        array.Add(reusedValue);
+        Assert.Equal(reusedValue, Assert.Single(array));
+        Assert.Equal(1, array.Count);
+        Assert.Equal(capacityBeforeRemoval, array.Capacity);
+        output.WriteLine($"Повторная очистка пустого массива инвалидировала обход; Add({reusedValue}) снова работает.");
+        output.WriteLine("");
         output.WriteLine("Эксперимент завершён. Все проверки пройдены.");
     }
 }
