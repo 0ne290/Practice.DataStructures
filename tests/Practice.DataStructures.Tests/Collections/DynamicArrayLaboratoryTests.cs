@@ -234,12 +234,12 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         using (IEnumerator<int> iterator = array.GetEnumerator())
         {
             Assert.True(iterator.MoveNext());
-            int foundIndex = array.IndexOf(reusedValue);
-            bool found = array.Contains(reusedValue);
+            int foundIndex = array.IndexOf((value, _) => value == reusedValue);
+            bool found = array.Contains((value, _) => value == reusedValue);
             Assert.Equal(0, foundIndex);
             Assert.True(found);
-            Assert.Equal(-1, array.IndexOf(int.MaxValue));
-            Assert.False(array.Contains(int.MaxValue));
+            Assert.Equal(-1, array.IndexOf((value, _) => value == int.MaxValue));
+            Assert.False(array.Contains((value, _) => value == int.MaxValue));
             Assert.Equal(reusedValue, iterator.Current);
             Assert.True(iterator.MoveNext());
             Assert.Equal(reusedValue, iterator.Current);
@@ -250,6 +250,19 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(new[] { reusedValue, reusedValue }, array);
         Assert.Equal(2, array.Count);
         Assert.Equal(capacityBeforeRemoval, array.Capacity);
+        int selectedPosition = array.IndexOf((_, position) => position == 1);
+        Assert.Equal(1, selectedPosition);
+        output.WriteLine($"Условие position == 1 выбрало индекс {selectedPosition} среди одинаковых значений.");
+        InvalidOperationException searchMutation = Assert.Throws<InvalidOperationException>(() =>
+        {
+            array.IndexOf((value, position) =>
+            {
+                array[position] = value;
+                return true;
+            });
+        });
+        Assert.Equal(new[] { reusedValue, reusedValue }, array);
+        output.WriteLine($"Запись из условия, даже того же значения: {searchMutation.GetType().Name}; поиск прерван.");
 
         // Act / Assert: очистка и повторное использование.
         output.WriteLine("");
@@ -263,8 +276,8 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(0, array.Count);
         Assert.Empty(array);
         Assert.Equal(capacityBeforeRemoval, array.Capacity);
-        Assert.Equal(-1, array.IndexOf(reusedValue));
-        Assert.False(array.Contains(reusedValue));
+        Assert.Equal(-1, array.IndexOf((value, _) => value == reusedValue));
+        Assert.False(array.Contains((value, _) => value == reusedValue));
         output.WriteLine($"Clear(): Count={array.Count}, Capacity={array.Capacity}; прежнее значение отсутствует, старый обход инвалидирован.");
         using (IEnumerator<int> iterator = array.GetEnumerator())
         {

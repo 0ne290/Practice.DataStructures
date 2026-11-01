@@ -164,33 +164,49 @@ public sealed class DynamicArray<T> : IEnumerable<T>
         _version = unchecked(_version + 1);
     }
 
-    /// <summary>Возвращает индекс первого элемента, равного заданному.</summary>
-    /// <param name="item">Искомое значение, включая допустимое для типа значение <see langword="null"/>.</param>
+    /// <summary>Возвращает индекс первого элемента, удовлетворяющего условию.</summary>
+    /// <param name="indexedPredicate">Условие, получающее элемент и его текущий индекс. Не должно быть <see langword="null"/>.</param>
     /// <returns>Индекс первого совпадения либо -1, если элемент отсутствует.</returns>
     /// <remarks>
-    /// Использует <see cref="EqualityComparer{T}.Default"/> и проверяет только элементы
-    /// с индексами от нуля до <see cref="Count"/> минус один, исключая резерв.
-    /// Сохраняет содержимое, количество, вместимость и работоспособность перечислителей.
-    /// Сложность — <c>O(n)</c>, дополнительная память — <c>O(1)</c>.
+    /// Проверяет элементы слева направо, исключая резерв. Условие вызывается один раз
+    /// для каждой посещённой позиции; после первого совпадения поиск прекращается.
+    /// Без изменений из условия сохраняет состояние массива и перечислителей.
+    /// После каждого нормально завершившегося вызова условия проверяет версию массива;
+    /// изменения из условия обнаруживаются, но не откатываются. Исключения условия
+    /// передаются вызывающему коду. Чтение и вложенный поиск разрешены.
+    /// Проверка аргумента на <see langword="null"/> не выполняется; поведение при
+    /// нарушении этого предусловия не гарантируется.
+    /// Сложность — <c>O(n)</c> при постоянной стоимости условия, дополнительная память — <c>O(1)</c>.
     /// </remarks>
-    public int IndexOf(T item)
+    /// <exception cref="InvalidOperationException">Условие изменило массив и вернуло результат.</exception>
+    public int IndexOf(IndexedPredicate<T> indexedPredicate)
     {
+        var versionSnapshot = _version;
+
         for (var i = 0; i < Count; i++)
-            if (EqualityComparer<T>.Default.Equals(_array[i], item))
+        {
+            var indexedPredicateResult = indexedPredicate(_array[i], i);
+            if (versionSnapshot != _version)
+                throw new InvalidOperationException("Collection was modified; search cannot continue.");
+
+            if (indexedPredicateResult)
                 return i;
+        }
 
         return -1;
     }
 
-    /// <summary>Проверяет наличие элемента, равного заданному.</summary>
-    /// <param name="item">Искомое значение, включая допустимое для типа значение <see langword="null"/>.</param>
+    /// <summary>Проверяет наличие элемента, удовлетворяющего условию.</summary>
+    /// <param name="indexedPredicate">Условие, получающее элемент и его текущий индекс. Не должно быть <see langword="null"/>.</param>
     /// <returns><see langword="true"/>, если элемент найден; иначе <see langword="false"/>.</returns>
     /// <remarks>
-    /// Использует правила равенства <see cref="EqualityComparer{T}.Default"/>, как и <see cref="IndexOf"/>.
-    /// Резерв не участвует в поиске. Состояние массива и перечислителей сохраняется.
-    /// Сложность — <c>O(n)</c>, дополнительная память — <c>O(1)</c>.
+    /// Использует <see cref="IndexOf"/> и соблюдает его порядок вызова условия,
+    /// правила обнаружения изменений и передачи исключений. Аргумент не проверяется
+    /// на <see langword="null"/>; поведение при нарушении предусловия не гарантируется.
+    /// Сложность — <c>O(n)</c> при постоянной стоимости условия, дополнительная память — <c>O(1)</c>.
     /// </remarks>
-    public bool Contains(T item) => IndexOf(item) != -1;
+    /// <exception cref="InvalidOperationException">Условие изменило массив и вернуло результат.</exception>
+    public bool Contains(IndexedPredicate<T> indexedPredicate) => IndexOf(indexedPredicate) != -1;
 
     /// <summary>Создаёт новый перечислитель элементов в порядке индексов.</summary>
     /// <returns>Перечислитель, расположенный перед первым элементом.</returns>

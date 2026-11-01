@@ -17,7 +17,7 @@ public sealed class DynamicArraySearchTests
         var array = new DynamicArray<int> { 10, 20, 10, 30 };
 
         // Act
-        int actual = array.IndexOf(item);
+        int actual = array.IndexOf((value, _) => value == item);
 
         // Assert
         Assert.Equal(expected, actual);
@@ -35,7 +35,7 @@ public sealed class DynamicArraySearchTests
         var array = new DynamicArray<int> { 10, 20, 10, 30 };
 
         // Act
-        bool actual = array.Contains(item);
+        bool actual = array.Contains((value, _) => value == item);
 
         // Assert
         Assert.Equal(expected, actual);
@@ -53,8 +53,8 @@ public sealed class DynamicArraySearchTests
         var array = new DynamicArray<string?> { first, null, null, "last" };
 
         // Act
-        int index = array.IndexOf(item);
-        bool contains = array.Contains(item);
+        int index = array.IndexOf((value, _) => value == item);
+        bool contains = array.Contains((value, _) => value == item);
 
         // Assert
         Assert.Equal(expectedIndex, index);
@@ -62,7 +62,7 @@ public sealed class DynamicArraySearchTests
     }
 
     [Fact]
-    public void Search_EqualDistinctObjects_UsesDefaultEqualityComparer()
+    public void Search_EqualDistinctObjects_UsesEqualityChosenByCaller()
     {
         // Arrange
         var stored = new SearchValue(7);
@@ -70,8 +70,8 @@ public sealed class DynamicArraySearchTests
         var array = new DynamicArray<SearchValue> { new(3), stored, new(7) };
 
         // Act
-        int index = array.IndexOf(sought);
-        bool contains = array.Contains(sought);
+        int index = array.IndexOf((value, _) => value.Equals(sought));
+        bool contains = array.Contains((value, _) => value.Equals(sought));
 
         // Assert
         Assert.NotSame(stored, sought);
@@ -90,8 +90,8 @@ public sealed class DynamicArraySearchTests
         string? item = searchNull ? null : "missing";
 
         // Act
-        int index = array.IndexOf(item);
-        bool contains = array.Contains(item);
+        int index = array.IndexOf((value, _) => value == item);
+        bool contains = array.Contains((value, _) => value == item);
 
         // Assert
         Assert.Equal(-1, index);
@@ -107,14 +107,14 @@ public sealed class DynamicArraySearchTests
         array[0] = 0;
 
         // Act / Assert
-        Assert.Equal(-1, array.IndexOf(30));
-        Assert.False(array.Contains(30));
-        Assert.Equal(-1, array.IndexOf(10));
-        Assert.False(array.Contains(10));
-        Assert.Equal(0, array.IndexOf(0));
-        Assert.True(array.Contains(0));
-        Assert.Equal(1, array.IndexOf(20));
-        Assert.True(array.Contains(20));
+        Assert.Equal(-1, array.IndexOf((value, _) => value == 30));
+        Assert.False(array.Contains((value, _) => value == 30));
+        Assert.Equal(-1, array.IndexOf((value, _) => value == 10));
+        Assert.False(array.Contains((value, _) => value == 10));
+        Assert.Equal(0, array.IndexOf((value, _) => value == 0));
+        Assert.True(array.Contains((value, _) => value == 0));
+        Assert.Equal(1, array.IndexOf((value, _) => value == 20));
+        Assert.True(array.Contains((value, _) => value == 20));
     }
 
     [Theory]
@@ -138,10 +138,10 @@ public sealed class DynamicArraySearchTests
         }
 
         // Act
-        int found = array.IndexOf(20);
-        int missing = array.IndexOf(0);
-        bool contains = array.Contains(10);
-        bool absent = array.Contains(99);
+        int found = array.IndexOf((value, _) => value == 20);
+        int missing = array.IndexOf((value, _) => value == 0);
+        bool contains = array.Contains((value, _) => value == 10);
+        bool absent = array.Contains((value, _) => value == 99);
 
         // Assert
         Assert.Equal(1, found);
@@ -163,6 +163,175 @@ public sealed class DynamicArraySearchTests
         }
 
         Assert.False(iterator.MoveNext());
+    }
+
+    [Theory]
+    [InlineData(false, -1, 3)]
+    [InlineData(false, 0, 1)]
+    [InlineData(false, 2, 3)]
+    [InlineData(true, -1, 3)]
+    [InlineData(true, 0, 1)]
+    [InlineData(true, 2, 3)]
+    public void Search_PositionCondition_VisitsInOrderAndStopsAtFirstMatch(bool containsSearch, int target, int expectedCalls)
+    {
+        // Arrange
+        var array = new DynamicArray<int>(8) { 10, 20, 30 };
+        var visited = new List<(int Item, int Index)>();
+        IndexedPredicate<int> predicate = (item, index) =>
+        {
+            visited.Add((item, index));
+            return index == target;
+        };
+
+        // Act / Assert
+        if (containsSearch)
+        {
+            Assert.Equal(target >= 0, array.Contains(predicate));
+        }
+        else
+        {
+            Assert.Equal(target, array.IndexOf(predicate));
+        }
+
+        Assert.Equal(expectedCalls, visited.Count);
+        Assert.Equal(new[] { (10, 0), (20, 1), (30, 2) }.Take(expectedCalls), visited);
+    }
+
+    [Fact]
+    public void Search_EmptyArray_DoesNotInvokePredicate()
+    {
+        // Arrange
+        var array = new DynamicArray<int>();
+        int calls = 0;
+        IndexedPredicate<int> predicate = (_, _) =>
+        {
+            calls++;
+            return true;
+        };
+
+        // Act
+        int index = array.IndexOf(predicate);
+        bool contains = array.Contains(predicate);
+
+        // Assert
+        Assert.Equal(-1, index);
+        Assert.False(contains);
+        Assert.Equal(0, calls);
+    }
+
+    [Fact]
+    public void Search_ReferenceAndFieldConditions_UsesCallerRules()
+    {
+        // Arrange
+        var first = new SearchValue(7);
+        var second = new SearchValue(7);
+        var array = new DynamicArray<SearchValue> { first, second, new(9) };
+
+        // Act
+        int identityIndex = array.IndexOf((item, _) => ReferenceEquals(item, second));
+        int fieldIndex = array.IndexOf((item, _) => item.Value == second.Value);
+        bool matchesOtherElement = array.Contains((item, position) => position > 0 && item.Value == array[0].Value);
+
+        // Assert
+        Assert.Equal(1, identityIndex);
+        Assert.Equal(0, fieldIndex);
+        Assert.True(matchesOtherElement);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Search_PredicateThrows_PropagatesSameExceptionAndPreservesState(bool containsSearch)
+    {
+        // Arrange
+        var array = new DynamicArray<int>(8) { 10, 20 };
+        using IEnumerator<int> iterator = array.GetEnumerator();
+        Assert.True(iterator.MoveNext());
+        var expected = new ArithmeticException("Predicate failed.");
+        IndexedPredicate<int> predicate = (_, _) => throw expected;
+
+        // Act
+        Exception? actual = Record.Exception(() =>
+        {
+            if (containsSearch)
+            {
+                _ = array.Contains(predicate);
+            }
+            else
+            {
+                _ = array.IndexOf(predicate);
+            }
+        });
+
+        // Assert
+        Assert.Same(expected, actual);
+        Assert.Equal(new[] { 10, 20 }, array);
+        Assert.Equal(2, array.Count);
+        Assert.Equal(8, array.Capacity);
+        Assert.Equal(10, iterator.Current);
+        Assert.True(iterator.MoveNext());
+        Assert.Equal(20, iterator.Current);
+        Assert.False(iterator.MoveNext());
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void Search_PredicateMutatesArray_ThrowsBeforeUsingResult(bool containsSearch, bool predicateResult)
+    {
+        // Arrange / Act / Assert: каждый вид изменения проверяется на новом массиве.
+        for (int mutation = 0; mutation < 4; mutation++)
+        {
+            int currentMutation = mutation;
+            var array = new DynamicArray<int>(2) { 10, 20 };
+            int calls = 0;
+            IndexedPredicate<int> predicate = (_, _) =>
+            {
+                calls++;
+                switch (currentMutation)
+                {
+                    case 0: array.Add(30); break;
+                    case 1: array.RemoveAt(0); break;
+                    case 2: array.Clear(); break;
+                    case 3: array[0] = 10; break;
+                }
+
+                return predicateResult;
+            };
+
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                if (containsSearch)
+                {
+                    _ = array.Contains(predicate);
+                }
+                else
+                {
+                    _ = array.IndexOf(predicate);
+                }
+            });
+            Assert.Equal(1, calls);
+            int[][] expected = [[10, 20, 30], [20], [], [10, 20]];
+            Assert.Equal(expected[mutation], array);
+            Assert.Equal(expected[mutation].Length, array.Count);
+        }
+    }
+
+    [Fact]
+    public void Search_NestedSearch_PreservesOuterSearch()
+    {
+        // Arrange
+        var array = new DynamicArray<int> { 10, 20, 30 };
+
+        // Act
+        int index = array.IndexOf((item, position) =>
+            position > 0 && array.Contains((other, _) => other == item - 10));
+
+        // Assert
+        Assert.Equal(1, index);
+        Assert.Equal(new[] { 10, 20, 30 }, array);
     }
 
     private sealed record SearchValue(int Value);
