@@ -1,24 +1,24 @@
 # Тестовая лаборатория
 
 Tests содержит проверки публичного API Core, эталоны .NET, фикстуры,
-воспроизводимые данные и измерительные сценарии. В `Collections/DynamicArrayTests.cs`
+воспроизводимые данные и измерительные сценарии. В `Collections/DynamicArray/DynamicArrayTests.cs`
 проверяются создание динамического массива, добавление, рост, доступ по индексу
 и ошибки аргументов. Тесты остальных структур добавляются после двух этапов ревью.
-В `Collections/DynamicArrayRemovalTests.cs` проверяются удаление по индексу,
+В `Collections/DynamicArray/DynamicArrayRemovalTests.cs` проверяются удаление по индексу,
 сохранение порядка и вместимости, ошибки и повторное использование массива.
-В `Collections/DynamicArrayStorageTests.cs` отдельно проверяется очистка
+В `Collections/DynamicArray/DynamicArrayStorageTests.cs` отдельно проверяется очистка
 освободившейся ячейки для значений, ссылок и структур со ссылочными полями.
 Эти проверки внутреннего инварианта обращаются к хранилищу через reflection.
-В `Collections/DynamicArrayEnumerationTests.cs` проверяются порядок перебора,
+В `Collections/DynamicArray/DynamicArrayEnumerationTests.cs` проверяются порядок перебора,
 пустая последовательность, повторные и вложенные обходы, ранний выход и оба
-варианта `IEnumerable`. В `Collections/DynamicArrayInvalidationTests.cs` проверяется
+варианта `IEnumerable`. В `Collections/DynamicArray/DynamicArrayInvalidationTests.cs` проверяется
 обнаружение изменений: успешные `Add`, `RemoveAt` и запись через индексатор
 инвалидируют старые перечислители, а чтение, отклонённая запись и удаление
 по недопустимому индексу сохраняют их работоспособность.
-В `Collections/DynamicArrayClearTests.cs` проверяются очистка, сохранение
+В `Collections/DynamicArray/DynamicArrayClearTests.cs` проверяются очистка, сохранение
 вместимости, повторное использование и инвалидирование перечислителей даже при
 очистке пустого массива. Проверки очистки ячеек находятся отдельно в
-`DynamicArrayStorageTests.cs`. В `Collections/DynamicArraySearchTests.cs`
+`DynamicArrayStorageTests.cs`. В `Collections/DynamicArray/DynamicArraySearchTests.cs`
 проверяются `IndexOf` и `Contains` с `IndexedPredicate<T>`: первое совпадение,
 порядок вызовов и остановка поиска, выбор по позиции, ссылке и полям, значения
 по умолчанию и `null` среди элементов, вложенный поиск, исключения условия,
@@ -78,12 +78,23 @@ Tests содержит проверки публичного API Core, этал�
 количество элементов. Условию доступны элемент и его текущая позиция в списке.
 Конкретный API и поведение операций автор выбирает самостоятельно.
 
-Полигон: `Collections/SinglyLinkedListLaboratoryTests.cs`. Он пока не проверяет
-реализацию; автор заполняет его своими экспериментами. Запуск:
+Оба этапа ревью завершены. В `Collections/SinglyLinkedList/` находятся обычные
+проверки операций и состояния, поиска, перечисления и обновления ссылочных объектов.
+Проверяются отсутствие и хранимые null/default, первое совпадение, позиции,
+ошибки делегатов, обнаружение изменений и сравнение с BCL на 500 операциях
+с фиксированным seed. Общий базовый класс коллекций и перечислителей не вводится.
+
+Демонстрация: `Collections/SinglyLinkedList/SinglyLinkedListLaboratoryTests.cs`.
+Показывает вставки, поиск, замену, удаление, обновление ссылочного объекта,
+инвалидирование обхода, ожидаемые ошибки, очистку и повторное использование.
+Запуск со случайным seed:
 
 ```powershell
 dotnet test Practice.DataStructures.sln --settings laboratory.runsettings --filter "FullyQualifiedName~SinglyLinkedListLaboratoryTests" --logger "console;verbosity=detailed"
 ```
+
+Для повтора добавить `--environment DATASTRUCTURES_LAB_SEED=12345`, заменив
+число на seed из вывода. Неверное значение переменной вызывает понятную ошибку.
 
 ## Обычные проверки
 
@@ -127,7 +138,7 @@ dotnet test Practice.DataStructures.sln --settings .runsettings
 а не незаметно заменяться случайным seed. В обычных тестах сохранять
 детерминированность, в сравнительных измерениях использовать фиксированные seed.
 
-Текущая демонстрация: `Collections/DynamicArrayLaboratoryTests.cs`. Она показывает
+Текущая демонстрация: `Collections/DynamicArray/DynamicArrayLaboratoryTests.cs`. Она показывает
 добавление случайных значений, рост вместимости, перебор через `foreach`, чтение
 и замену через индексатор, удаление по случайным индексам, сохранение вместимости
 после удаления всех элементов и повторное использование массива. Сценарий также

@@ -2,7 +2,7 @@ using System.Globalization;
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections;
+namespace Practice.DataStructures.Tests.Collections.DynamicArray;
 
 public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
 {
