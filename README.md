@@ -17,7 +17,8 @@
 Репозиторий, solution и префикс пространств имён: `Practice.DataStructures`.
 В решении ровно два проекта. Разделение заданий выполняется папками и
 пространствами имён внутри них по мере реализации. В Core добавлен
-`Collections/DynamicArray<T>` и `Collections/SinglyLinkedList<T>`. Tests проверяет их публичные контракты
+`Collections/DynamicArray<T>`, `Collections/SinglyLinkedList<T>` и
+`Collections/DoublyLinkedList<T>`. Tests проверяет их публичные контракты
 и загрузку Core как библиотеки.
 
 Порядок работы: академическая постановка и лабораторный полигон, самостоятельная

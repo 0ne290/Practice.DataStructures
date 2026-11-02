@@ -14,14 +14,14 @@ public sealed class SinglyLinkedListTests
         // Assert
         Assert.Equal(0, list.Count);
         Assert.Empty(list);
-        Assert.False(list.TryFirst(out int first));
-        Assert.False(list.TryLast(out int last));
-        Assert.False(list.TryFindFirst((_, _) => true, out int found));
+        Assert.False(list.Values.TryFirst(out int first));
+        Assert.False(list.Values.TryLast(out int last));
+        Assert.False(list.Values.TryFindFirst((_, _) => true, out int found));
         Assert.Equal(0, first);
         Assert.Equal(0, last);
         Assert.Equal(0, found);
-        Assert.Equal(-1, list.PositionOf((_, _) => true));
-        Assert.False(list.Contains((_, _) => true));
+        Assert.Equal(-1, list.Values.PositionOf((_, _) => true));
+        Assert.False(list.Values.Contains((_, _) => true));
     }
 
     [Fact]
@@ -31,15 +31,15 @@ public sealed class SinglyLinkedListTests
         var list = new SinglyLinkedList<int>();
 
         // Act
-        list.AddFirst(2);
-        list.AddFirst(1);
-        list.AddLast(3);
+        list.Values.AddFirst(2);
+        list.Values.AddFirst(1);
+        list.Values.AddLast(3);
 
         // Assert
         Assert.Equal(new[] { 1, 2, 3 }, list);
         Assert.Equal(3, list.Count);
-        Assert.True(list.TryFirst(out int first));
-        Assert.True(list.TryLast(out int last));
+        Assert.True(list.Values.TryFirst(out int first));
+        Assert.True(list.Values.TryLast(out int last));
         Assert.Equal(1, first);
         Assert.Equal(3, last);
     }
@@ -58,23 +58,23 @@ public sealed class SinglyLinkedListTests
         var expected = new List<int> { 1, 2, 3 };
         foreach (int value in expected)
         {
-            list.AddLast(value);
+            list.Values.AddLast(value);
         }
 
         // Act
         bool inserted = before
-            ? list.AddBefore((_, index) => index == position, 9)
-            : list.AddAfter((_, index) => index == position, 9);
+            ? list.Values.AddBefore((_, index) => index == position, 9)
+            : list.Values.AddAfter((_, index) => index == position, 9);
         expected.Insert(before ? position : position + 1, 9);
-        list.AddLast(10);
+        list.Values.AddLast(10);
         expected.Add(10);
 
         // Assert
         Assert.True(inserted);
         Assert.Equal(expected, list);
         Assert.Equal(expected.Count, list.Count);
-        Assert.True(list.TryFirst(out int first));
-        Assert.True(list.TryLast(out int last));
+        Assert.True(list.Values.TryFirst(out int first));
+        Assert.True(list.Values.TryLast(out int last));
         Assert.Equal(expected[0], first);
         Assert.Equal(10, last);
     }
@@ -91,22 +91,22 @@ public sealed class SinglyLinkedListTests
         var expected = Enumerable.Range(1, count).ToList();
         foreach (int value in expected)
         {
-            list.AddLast(value);
+            list.Values.AddLast(value);
         }
 
         // Act
-        bool removed = list.RemoveFirst((_, index) => index == position);
+        bool removed = list.Values.RemoveFirst((_, index) => index == position);
         expected.RemoveAt(position);
 
         // Assert
         Assert.True(removed);
         Assert.Equal(expected, list);
         Assert.Equal(expected.Count, list.Count);
-        Assert.Equal(expected.Count != 0, list.TryFirst(out int first));
-        Assert.Equal(expected.Count != 0, list.TryLast(out int last));
+        Assert.Equal(expected.Count != 0, list.Values.TryFirst(out int first));
+        Assert.Equal(expected.Count != 0, list.Values.TryLast(out int last));
         Assert.Equal(expected.FirstOrDefault(), first);
         Assert.Equal(expected.LastOrDefault(), last);
-        list.AddLast(9);
+        list.Values.AddLast(9);
         expected.Add(9);
         Assert.Equal(expected, list);
     }
@@ -120,19 +120,19 @@ public sealed class SinglyLinkedListTests
         var list = new SinglyLinkedList<int>();
         for (int index = 0; index < count; index++)
         {
-            list.AddLast(index);
+            list.Values.AddLast(index);
         }
 
         // Act
-        list.Clear();
+        list.Values.Clear();
 
         // Assert
         Assert.Empty(list);
         Assert.Equal(0, list.Count);
-        Assert.False(list.TryFirst(out _));
-        Assert.False(list.TryLast(out _));
-        list.AddFirst(7);
-        list.AddLast(8);
+        Assert.False(list.Values.TryFirst(out _));
+        Assert.False(list.Values.TryLast(out _));
+        list.Values.AddFirst(7);
+        list.Values.AddLast(8);
         Assert.Equal(new[] { 7, 8 }, list);
     }
 
@@ -153,51 +153,51 @@ public sealed class SinglyLinkedListTests
             switch (random.Next(7))
             {
                 case 0:
-                    list.AddFirst(value);
+                    list.Values.AddFirst(value);
                     expected.Insert(0, value);
                     break;
                 case 1:
-                    list.AddLast(value);
+                    list.Values.AddLast(value);
                     expected.Add(value);
                     break;
                 case 2:
-                    Assert.Equal(exists, list.AddBefore((_, index) => index == position, value));
+                    Assert.Equal(exists, list.Values.AddBefore((_, index) => index == position, value));
                     if (exists)
                     {
                         expected.Insert(position, value);
                     }
                     break;
                 case 3:
-                    Assert.Equal(exists, list.AddAfter((_, index) => index == position, value));
+                    Assert.Equal(exists, list.Values.AddAfter((_, index) => index == position, value));
                     if (exists)
                     {
                         expected.Insert(position + 1, value);
                     }
                     break;
                 case 4:
-                    Assert.Equal(exists, list.RemoveFirst((_, index) => index == position));
+                    Assert.Equal(exists, list.Values.RemoveFirst((_, index) => index == position));
                     if (exists)
                     {
                         expected.RemoveAt(position);
                     }
                     break;
                 case 5:
-                    Assert.Equal(exists, list.ReplaceFirst((_, index) => index == position, value));
+                    Assert.Equal(exists, list.Values.ReplaceFirst((_, index) => index == position, value));
                     if (exists)
                     {
                         expected[position] = value;
                     }
                     break;
                 default:
-                    list.Clear();
+                    list.Values.Clear();
                     expected.Clear();
                     break;
             }
 
             Assert.Equal(expected, list);
             Assert.Equal(expected.Count, list.Count);
-            Assert.Equal(expected.Count > 0, list.TryFirst(out int first));
-            Assert.Equal(expected.Count > 0, list.TryLast(out int last));
+            Assert.Equal(expected.Count > 0, list.Values.TryFirst(out int first));
+            Assert.Equal(expected.Count > 0, list.Values.TryLast(out int last));
             Assert.Equal(expected.FirstOrDefault(), first);
             Assert.Equal(expected.LastOrDefault(), last);
         }

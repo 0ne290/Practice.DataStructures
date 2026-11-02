@@ -17,7 +17,7 @@ public sealed class SinglyLinkedListEnumerationTests
         int[] expected = [.. Enumerable.Range(1, count)];
         foreach (int value in expected)
         {
-            list.AddLast(value);
+            list.Values.AddLast(value);
         }
         using IEnumerator<int> iterator = list.GetEnumerator();
 
@@ -42,8 +42,8 @@ public sealed class SinglyLinkedListEnumerationTests
     {
         // Arrange
         var list = new SinglyLinkedList<int>();
-        list.AddLast(1);
-        list.AddLast(2);
+        list.Values.AddLast(1);
+        list.Values.AddLast(2);
         var pairs = new List<(int, int)>();
         var nonGenericValues = new List<int>();
 
@@ -79,7 +79,7 @@ public sealed class SinglyLinkedListEnumerationTests
         for (int state = 0; state < 3; state++)
         {
             var list = new SinglyLinkedList<int>();
-            list.AddLast(1);
+            list.Values.AddLast(1);
             using IEnumerator<int> iterator = list.GetEnumerator();
             if (state > 0)
             {
@@ -92,13 +92,13 @@ public sealed class SinglyLinkedListEnumerationTests
 
             switch (mutation)
             {
-                case 0: list.AddFirst(2); break;
-                case 1: list.AddLast(2); break;
-                case 2: Assert.True(list.AddBefore((_, _) => true, 2)); break;
-                case 3: Assert.True(list.AddAfter((_, _) => true, 2)); break;
-                case 4: Assert.True(list.ReplaceFirst((_, _) => true, 1)); break;
-                case 5: Assert.True(list.RemoveFirst((_, _) => true)); break;
-                default: list.Clear(); break;
+                case 0: list.Values.AddFirst(2); break;
+                case 1: list.Values.AddLast(2); break;
+                case 2: Assert.True(list.Values.AddBefore((_, _) => true, 2)); break;
+                case 3: Assert.True(list.Values.AddAfter((_, _) => true, 2)); break;
+                case 4: Assert.True(list.Values.ReplaceFirst((_, _) => true, 1)); break;
+                case 5: Assert.True(list.Values.RemoveFirst((_, _) => true)); break;
+                default: list.Values.Clear(); break;
             }
 
             Assert.Throws<InvalidOperationException>(() => iterator.MoveNext());
@@ -112,19 +112,19 @@ public sealed class SinglyLinkedListEnumerationTests
     {
         // Arrange
         var list = new SinglyLinkedList<int>();
-        list.AddLast(1);
+        list.Values.AddLast(1);
         using IEnumerator<int> iterator = list.GetEnumerator();
 
         // Act
-        Assert.True(list.TryFirst(out _));
-        Assert.True(list.TryLast(out _));
-        Assert.True(list.TryFindFirst((_, _) => true, out _));
-        Assert.True(list.Contains((_, _) => true));
-        Assert.Equal(0, list.PositionOf((_, _) => true));
-        Assert.False(list.AddBefore((_, _) => false, 2));
-        Assert.False(list.AddAfter((_, _) => false, 2));
-        Assert.False(list.ReplaceFirst((_, _) => false, 2));
-        Assert.False(list.RemoveFirst((_, _) => false));
+        Assert.True(list.Values.TryFirst(out _));
+        Assert.True(list.Values.TryLast(out _));
+        Assert.True(list.Values.TryFindFirst((_, _) => true, out _));
+        Assert.True(list.Values.Contains((_, _) => true));
+        Assert.Equal(0, list.Values.PositionOf((_, _) => true));
+        Assert.False(list.Values.AddBefore((_, _) => false, 2));
+        Assert.False(list.Values.AddAfter((_, _) => false, 2));
+        Assert.False(list.Values.ReplaceFirst((_, _) => false, 2));
+        Assert.False(list.Values.RemoveFirst((_, _) => false));
 
         // Assert
         Assert.True(iterator.MoveNext());
@@ -142,7 +142,7 @@ public sealed class SinglyLinkedListEnumerationTests
         using IEnumerator<int> iterator = list.GetEnumerator();
 
         // Act
-        list.Clear();
+        list.Values.Clear();
 
         // Assert
         Assert.Throws<InvalidOperationException>(() => iterator.MoveNext());

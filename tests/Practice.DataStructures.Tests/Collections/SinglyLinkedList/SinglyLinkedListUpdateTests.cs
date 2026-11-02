@@ -10,12 +10,12 @@ public sealed class SinglyLinkedListUpdateTests
     {
         // Arrange
         var list = new SinglyLinkedList<int>();
-        list.AddLast(1);
-        list.AddLast(2);
-        list.AddLast(2);
+        list.Values.AddLast(1);
+        list.Values.AddLast(2);
+        list.Values.AddLast(2);
 
         // Act
-        bool replaced = list.ReplaceFirst((value, _) => value == 2, 9);
+        bool replaced = list.Values.ReplaceFirst((value, _) => value == 2, 9);
 
         // Assert
         Assert.True(replaced);
@@ -30,18 +30,18 @@ public sealed class SinglyLinkedListUpdateTests
         var first = new MutableItem { Value = 2 };
         var second = new MutableItem { Value = 2 };
         var list = new SinglyLinkedList<MutableItem>();
-        list.AddLast(first);
-        list.AddLast(second);
+        list.Values.AddLast(first);
+        list.Values.AddLast(second);
         using IEnumerator<MutableItem> iterator = list.GetEnumerator();
 
         // Act
-        bool updated = list.UpdateFirst((item, _) => item.Value == 2, item => item.Value = 9);
+        bool updated = list.Values.UpdateFirst((item, _) => item.Value == 2, item => item.Value = 9);
 
         // Assert
         Assert.True(updated);
         Assert.Equal(9, first.Value);
         Assert.Equal(2, second.Value);
-        Assert.True(list.TryFirst(out MutableItem? result));
+        Assert.True(list.Values.TryFirst(out MutableItem? result));
         Assert.Same(first, result);
         Assert.Equal(2, list.Count);
         Assert.Throws<InvalidOperationException>(() => iterator.MoveNext());
@@ -56,12 +56,12 @@ public sealed class SinglyLinkedListUpdateTests
         var list = new SinglyLinkedList<int>();
         if (populated)
         {
-            list.AddLast(1);
+            list.Values.AddLast(1);
         }
         int calls = 0;
 
         // Act
-        Assert.Throws<NotSupportedException>(() => list.UpdateFirst((_, _) =>
+        Assert.Throws<NotSupportedException>(() => list.Values.UpdateFirst((_, _) =>
         {
             calls++;
             return true;
@@ -79,7 +79,7 @@ public sealed class SinglyLinkedListUpdateTests
         var list = new SinglyLinkedList<int?>();
 
         // Act / Assert
-        Assert.Throws<NotSupportedException>(() => list.UpdateFirst((_, _) => true, _ => { }));
+        Assert.Throws<NotSupportedException>(() => list.Values.UpdateFirst((_, _) => true, _ => { }));
     }
 
     [Fact]
@@ -87,12 +87,12 @@ public sealed class SinglyLinkedListUpdateTests
     {
         // Arrange
         var list = new SinglyLinkedList<string?>();
-        list.AddLast(null);
+        list.Values.AddLast(null);
         int calls = 0;
         bool receivedNull = false;
 
         // Act
-        bool updated = list.UpdateFirst((item, _) => item is null, item =>
+        bool updated = list.Values.UpdateFirst((item, _) => item is null, item =>
         {
             receivedNull = item is null;
             calls++;
@@ -110,12 +110,12 @@ public sealed class SinglyLinkedListUpdateTests
     {
         // Arrange
         var list = new SinglyLinkedList<string>();
-        list.AddLast("one");
+        list.Values.AddLast("one");
         using IEnumerator<string> iterator = list.GetEnumerator();
         int calls = 0;
 
         // Act
-        bool updated = list.UpdateFirst((_, _) => false, _ => calls++);
+        bool updated = list.Values.UpdateFirst((_, _) => false, _ => calls++);
 
         // Assert
         Assert.False(updated);
@@ -129,11 +129,11 @@ public sealed class SinglyLinkedListUpdateTests
     {
         // Arrange
         var list = new SinglyLinkedList<string>();
-        list.AddLast("one");
+        list.Values.AddLast("one");
         using IEnumerator<string> iterator = list.GetEnumerator();
 
         // Act
-        Assert.True(list.UpdateFirst((_, _) => true, _ => { }));
+        Assert.True(list.Values.UpdateFirst((_, _) => true, _ => { }));
 
         // Assert
         Assert.Throws<InvalidOperationException>(() => iterator.MoveNext());
@@ -144,10 +144,10 @@ public sealed class SinglyLinkedListUpdateTests
     {
         // Arrange
         var list = new SinglyLinkedList<string>();
-        list.AddLast("one");
+        list.Values.AddLast("one");
 
         // Act
-        Assert.Throws<InvalidOperationException>(() => list.UpdateFirst((_, _) => true, _ => list.Clear()));
+        Assert.Throws<InvalidOperationException>(() => list.Values.UpdateFirst((_, _) => true, _ => list.Values.Clear()));
 
         // Assert
         Assert.Empty(list);
@@ -160,12 +160,12 @@ public sealed class SinglyLinkedListUpdateTests
         // Arrange
         var item = new MutableItem { Value = 1 };
         var list = new SinglyLinkedList<MutableItem>();
-        list.AddLast(item);
+        list.Values.AddLast(item);
         using IEnumerator<MutableItem> iterator = list.GetEnumerator();
         var expected = new ArithmeticException("Update failed.");
 
         // Act
-        ArithmeticException actual = Assert.Throws<ArithmeticException>(() => list.UpdateFirst((_, _) => true, value =>
+        ArithmeticException actual = Assert.Throws<ArithmeticException>(() => list.Values.UpdateFirst((_, _) => true, value =>
         {
             value.Value = 9;
             throw expected;

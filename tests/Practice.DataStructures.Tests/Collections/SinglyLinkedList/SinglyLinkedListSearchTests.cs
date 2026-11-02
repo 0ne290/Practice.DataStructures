@@ -14,13 +14,13 @@ public sealed class SinglyLinkedListSearchTests
     {
         // Arrange
         var list = new SinglyLinkedList<int>();
-        list.AddLast(4);
-        list.AddLast(4);
-        list.AddLast(4);
+        list.Values.AddLast(4);
+        list.Values.AddLast(4);
+        list.Values.AddLast(4);
         var visited = new List<(int Value, int Position)>();
 
         // Act
-        bool found = list.TryFindFirst((value, position) =>
+        bool found = list.Values.TryFindFirst((value, position) =>
         {
             visited.Add((value, position));
             return position == target;
@@ -30,8 +30,8 @@ public sealed class SinglyLinkedListSearchTests
         Assert.Equal(target >= 0, found);
         Assert.Equal(target >= 0 ? 4 : 0, result);
         Assert.Equal(Enumerable.Range(0, target >= 0 ? target + 1 : 3).Select(index => (4, index)), visited);
-        Assert.Equal(target, list.PositionOf((_, index) => index == target));
-        Assert.Equal(target >= 0, list.Contains((_, index) => index == target));
+        Assert.Equal(target, list.Values.PositionOf((_, index) => index == target));
+        Assert.Equal(target >= 0, list.Values.Contains((_, index) => index == target));
     }
 
     [Fact]
@@ -40,24 +40,24 @@ public sealed class SinglyLinkedListSearchTests
         // Arrange
         var values = new SinglyLinkedList<int>();
         var references = new SinglyLinkedList<string?>();
-        values.AddLast(0);
-        references.AddLast(null);
+        values.Values.AddLast(0);
+        references.Values.AddLast(null);
 
         // Act / Assert
-        Assert.True(values.TryFirst(out int first));
-        Assert.True(values.TryLast(out int last));
-        Assert.True(values.TryFindFirst((value, _) => value == 0, out int found));
+        Assert.True(values.Values.TryFirst(out int first));
+        Assert.True(values.Values.TryLast(out int last));
+        Assert.True(values.Values.TryFindFirst((value, _) => value == 0, out int found));
         Assert.Equal(0, first);
         Assert.Equal(0, last);
         Assert.Equal(0, found);
-        Assert.True(references.TryFirst(out string? nullFirst));
-        Assert.True(references.TryLast(out string? nullLast));
-        Assert.True(references.TryFindFirst((value, _) => value is null, out string? nullFound));
+        Assert.True(references.Values.TryFirst(out string? nullFirst));
+        Assert.True(references.Values.TryLast(out string? nullLast));
+        Assert.True(references.Values.TryFindFirst((value, _) => value is null, out string? nullFound));
         Assert.Null(nullFirst);
         Assert.Null(nullLast);
         Assert.Null(nullFound);
-        references.Clear();
-        Assert.False(references.TryFindFirst((_, _) => true, out string? missing));
+        references.Values.Clear();
+        Assert.False(references.Values.TryFindFirst((_, _) => true, out string? missing));
         Assert.Null(missing);
     }
 
@@ -70,12 +70,12 @@ public sealed class SinglyLinkedListSearchTests
         var list = new SinglyLinkedList<int>();
         if (count == 1)
         {
-            list.AddLast(1);
+            list.Values.AddLast(1);
         }
         int calls = 0;
 
         // Act
-        bool found = list.Contains((_, _) =>
+        bool found = list.Values.Contains((_, _) =>
         {
             calls++;
             return false;
@@ -93,12 +93,12 @@ public sealed class SinglyLinkedListSearchTests
     {
         // Arrange
         var list = new SinglyLinkedList<int>();
-        list.AddLast(1);
+        list.Values.AddLast(1);
 
         // Act
-        Assert.Throws<InvalidOperationException>(() => list.AddAfter((_, _) =>
+        Assert.Throws<InvalidOperationException>(() => list.Values.AddAfter((_, _) =>
         {
-            list.Clear();
+            list.Values.Clear();
             return predicateResult;
         }, 9));
 
@@ -112,12 +112,12 @@ public sealed class SinglyLinkedListSearchTests
     {
         // Arrange
         var list = new SinglyLinkedList<int>();
-        list.AddLast(1);
+        list.Values.AddLast(1);
         var expected = new ArithmeticException("Condition failed.");
 
         // Act
         ArithmeticException actual = Assert.Throws<ArithmeticException>(() =>
-            list.RemoveFirst((_, _) => throw expected));
+            list.Values.RemoveFirst((_, _) => throw expected));
 
         // Assert
         Assert.Same(expected, actual);
@@ -129,11 +129,11 @@ public sealed class SinglyLinkedListSearchTests
     {
         // Arrange
         var list = new SinglyLinkedList<int>();
-        list.AddLast(1);
-        list.AddLast(2);
+        list.Values.AddLast(1);
+        list.Values.AddLast(2);
 
         // Act
-        int position = list.PositionOf((value, _) => list.Contains((other, _) => other == value) && value == 2);
+        int position = list.Values.PositionOf((value, _) => list.Values.Contains((other, _) => other == value) && value == 2);
 
         // Assert
         Assert.Equal(1, position);
