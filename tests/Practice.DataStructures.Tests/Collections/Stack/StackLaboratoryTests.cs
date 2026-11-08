@@ -89,5 +89,64 @@ public sealed class StackLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(42, stack.Pop());
         Assert.True(stack.IsEmpty);
         output.WriteLine("Повторное заполнение, очистка и повторное использование: Push(42), Peek()=42, Pop()=42; стек пуст.");
+
+        DemonstrateLinkedStack(input);
+    }
+
+    private void DemonstrateLinkedStack(int[] input)
+    {
+        output.WriteLine("LinkedStack<T>: те же входные данные и seed, связное хранение.");
+        var stack = new LinkedStack<int>();
+        Assert.True(stack.IsEmpty);
+        for (int i = 0; i < input.Length; i++)
+        {
+            stack.Push(input[i]);
+            Assert.Equal(i + 1, stack.Count);
+            Assert.Equal(input[i], stack.Peek());
+            output.WriteLine($"Push({input[i]}): Count={stack.Count}, вершина={stack.Peek()}");
+        }
+
+        int position = input.Length - 1;
+        foreach (int value in stack)
+        {
+            Assert.Equal(input[position--], value);
+            output.WriteLine($"foreach: {value}");
+        }
+        Assert.Equal(-1, position);
+        Assert.Equal(input.Length, stack.Count);
+
+        using (IEnumerator<int> enumerator = stack.GetEnumerator())
+        {
+            Assert.True(enumerator.MoveNext());
+            stack.Push(42);
+            Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
+            Assert.Equal(42, stack.Pop());
+            output.WriteLine("Push во время обхода: перечислитель обнаружил изменение.");
+        }
+
+        for (int i = input.Length - 1; i >= 0; i--)
+        {
+            int value = stack.Pop();
+            Assert.Equal(input[i], value);
+            Assert.Equal(i, stack.Count);
+            output.WriteLine($"Pop()={value}: Count={stack.Count}");
+        }
+        Assert.True(stack.IsEmpty);
+        InvalidOperationException popError = Assert.Throws<InvalidOperationException>(() => stack.Pop());
+        InvalidOperationException peekError = Assert.Throws<InvalidOperationException>(() => stack.Peek());
+        output.WriteLine($"Пустой связный стек: Pop — {popError.Message}; Peek — {peekError.Message}");
+
+        foreach (int value in input)
+        {
+            stack.Push(value);
+        }
+        stack.Clear();
+        Assert.Equal(0, stack.Count);
+        stack.Clear();
+        stack.Push(42);
+        Assert.Equal(42, stack.Peek());
+        Assert.Equal(42, stack.Pop());
+        Assert.True(stack.IsEmpty);
+        output.WriteLine("Связный стек: очистка и повторное использование завершены; стек пуст.");
     }
 }
