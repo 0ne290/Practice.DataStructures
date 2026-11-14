@@ -119,7 +119,7 @@ public sealed class SinglyLinkedListLaboratoryTests(ITestOutputHelper output)
         Assert.True(before.TryRemoveAfter(out int removedAfter));
         Assert.Equal(2, removedAfter);
         before.InsertAfter(3);
-        Assert.Equal(new[] { 0, 10, 3 }, list);
+        Assert.Equal([0, 10, 3], list);
         Assert.True(list.Values.Contains((value, position) => value == 3 && position == 2));
         output.WriteLine($"Values и Cursors используют одну цепочку: [{string.Join(", ", list)}]; курсор сохранился после вставки головы и замены значения через Values.");
         list.Values.Clear();

@@ -137,6 +137,6 @@ public sealed class SinglyLinkedListSearchTests
 
         // Assert
         Assert.Equal(1, position);
-        Assert.Equal(new[] { 1, 2 }, list);
+        Assert.Equal([1, 2], list);
     }
 }

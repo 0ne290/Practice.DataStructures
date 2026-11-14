@@ -62,8 +62,8 @@ public sealed class DoublyLinkedListCursorTests
         Assert.Equal(20, independent.Value);
         Assert.True(independent.MoveNext());
         Assert.Equal(30, independent.Value);
-        Assert.Equal(new[] { 1, 20, 30, 3 }, list);
-        Assert.Equal(new[] { 3, 30, 20, 1 }, list.Reverse());
+        Assert.Equal([1, 20, 30, 3], list);
+        Assert.Equal([3, 30, 20, 1], list.Reverse());
     }
 
     [Theory]
@@ -98,7 +98,7 @@ public sealed class DoublyLinkedListCursorTests
         Assert.Throws<InvalidOperationException>(() => cursor.InsertAfter(9));
         Assert.Throws<InvalidOperationException>(cursor.Remove);
         Assert.Throws<InvalidOperationException>(() => alias.Value);
-        Assert.Equal(new[] { 2 }, list);
+        Assert.Equal([2], list);
         Assert.Equal(1, list.Count);
     }
 

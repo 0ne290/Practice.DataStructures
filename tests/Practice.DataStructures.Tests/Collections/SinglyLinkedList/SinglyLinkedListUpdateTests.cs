@@ -19,7 +19,7 @@ public sealed class SinglyLinkedListUpdateTests
 
         // Assert
         Assert.True(replaced);
-        Assert.Equal(new[] { 1, 9, 2 }, list);
+        Assert.Equal([1, 9, 2], list);
         Assert.Equal(3, list.Count);
     }
 

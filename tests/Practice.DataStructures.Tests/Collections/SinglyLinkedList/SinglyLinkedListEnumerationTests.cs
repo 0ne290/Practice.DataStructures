@@ -62,7 +62,7 @@ public sealed class SinglyLinkedListEnumerationTests
 
         // Assert
         Assert.Equal(new[] { (1, 1), (1, 2), (2, 1), (2, 2) }, pairs);
-        Assert.Equal(new[] { 1, 2 }, nonGenericValues);
+        Assert.Equal([1, 2], nonGenericValues);
     }
 
     [Theory]

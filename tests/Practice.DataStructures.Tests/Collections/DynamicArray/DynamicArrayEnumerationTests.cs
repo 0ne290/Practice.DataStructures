@@ -41,8 +41,7 @@ public sealed class DynamicArrayEnumerationTests
     {
         // Arrange
         var array = new DynamicArray<int> { 10, 20 };
-        IEnumerable<int> sequence = array;
-        using IEnumerator<int> iterator = sequence.GetEnumerator();
+        using IEnumerator<int> iterator = Assert.IsType<IEnumerable<int>>(array, exactMatch: false).GetEnumerator();
         var actual = new List<int>();
 
         // Act
@@ -101,8 +100,8 @@ public sealed class DynamicArrayEnumerationTests
         }
 
         // Act
-        int[] firstPass = array.ToArray();
-        int[] secondPass = array.ToArray();
+        int[] firstPass = [.. array];
+        int[] secondPass = [.. array];
 
         // Assert
         Assert.Equal(expected, firstPass);
@@ -149,7 +148,7 @@ public sealed class DynamicArrayEnumerationTests
             break;
         }
 
-        int[] secondPass = array.ToArray();
+        int[] secondPass = [.. array];
 
         // Assert
         Assert.Equal(10, Assert.Single(firstPass));

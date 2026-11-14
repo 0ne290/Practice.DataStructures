@@ -150,7 +150,7 @@ public sealed class DynamicArraySearchTests
         Assert.False(absent);
         Assert.Equal(2, array.Count);
         Assert.Equal(8, array.Capacity);
-        Assert.Equal(new[] { 10, 20 }, array);
+        Assert.Equal([10, 20], array);
         if (position == 1)
         {
             Assert.Equal(10, iterator.Current);
@@ -177,20 +177,20 @@ public sealed class DynamicArraySearchTests
         // Arrange
         var array = new DynamicArray<int>(8) { 10, 20, 30 };
         var visited = new List<(int Item, int Index)>();
-        IndexedPredicate<int> predicate = (item, index) =>
+        bool Predicate(int item, int index)
         {
             visited.Add((item, index));
             return index == target;
-        };
+        }
 
         // Act / Assert
         if (containsSearch)
         {
-            Assert.Equal(target >= 0, array.Contains(predicate));
+            Assert.Equal(target >= 0, array.Contains(Predicate));
         }
         else
         {
-            Assert.Equal(target, array.IndexOf(predicate));
+            Assert.Equal(target, array.IndexOf(Predicate));
         }
 
         Assert.Equal(expectedCalls, visited.Count);
@@ -203,15 +203,15 @@ public sealed class DynamicArraySearchTests
         // Arrange
         var array = new DynamicArray<int>();
         int calls = 0;
-        IndexedPredicate<int> predicate = (_, _) =>
+        bool Predicate(int item, int index)
         {
             calls++;
             return true;
-        };
+        }
 
         // Act
-        int index = array.IndexOf(predicate);
-        bool contains = array.Contains(predicate);
+        int index = array.IndexOf(Predicate);
+        bool contains = array.Contains(Predicate);
 
         // Assert
         Assert.Equal(-1, index);
@@ -248,24 +248,24 @@ public sealed class DynamicArraySearchTests
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
         var expected = new ArithmeticException("Predicate failed.");
-        IndexedPredicate<int> predicate = (_, _) => throw expected;
+        bool Predicate(int item, int index) => throw expected;
 
         // Act
         Exception? actual = Record.Exception(() =>
         {
             if (containsSearch)
             {
-                _ = array.Contains(predicate);
+                _ = array.Contains(Predicate);
             }
             else
             {
-                _ = array.IndexOf(predicate);
+                _ = array.IndexOf(Predicate);
             }
         });
 
         // Assert
         Assert.Same(expected, actual);
-        Assert.Equal(new[] { 10, 20 }, array);
+        Assert.Equal([10, 20], array);
         Assert.Equal(2, array.Count);
         Assert.Equal(8, array.Capacity);
         Assert.Equal(10, iterator.Current);
@@ -287,7 +287,7 @@ public sealed class DynamicArraySearchTests
             int currentMutation = mutation;
             var array = new DynamicArray<int>(2) { 10, 20 };
             int calls = 0;
-            IndexedPredicate<int> predicate = (_, _) =>
+            bool Predicate(int item, int index)
             {
                 calls++;
                 switch (currentMutation)
@@ -299,17 +299,17 @@ public sealed class DynamicArraySearchTests
                 }
 
                 return predicateResult;
-            };
+            }
 
             Assert.Throws<InvalidOperationException>(() =>
             {
                 if (containsSearch)
                 {
-                    _ = array.Contains(predicate);
+                    _ = array.Contains(Predicate);
                 }
                 else
                 {
-                    _ = array.IndexOf(predicate);
+                    _ = array.IndexOf(Predicate);
                 }
             });
             Assert.Equal(1, calls);
@@ -331,7 +331,7 @@ public sealed class DynamicArraySearchTests
 
         // Assert
         Assert.Equal(1, index);
-        Assert.Equal(new[] { 10, 20, 30 }, array);
+        Assert.Equal([10, 20, 30], array);
     }
 
     private sealed record SearchValue(int Value);

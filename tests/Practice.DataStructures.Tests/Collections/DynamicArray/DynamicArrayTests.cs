@@ -140,6 +140,7 @@ public sealed class DynamicArrayTests
     {
         // Arrange
         var array = new DynamicArray<int>();
+        Assert.Empty(array);
 
         // Act
         array.Add(item);
@@ -157,6 +158,7 @@ public sealed class DynamicArrayTests
     {
         // Arrange
         var array = new DynamicArray<string?>();
+        Assert.Empty(array);
 
         // Act
         array.Add(item);

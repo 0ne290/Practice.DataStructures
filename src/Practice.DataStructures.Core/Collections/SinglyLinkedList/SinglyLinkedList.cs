@@ -95,7 +95,7 @@ public sealed partial class SinglyLinkedList<T> : IEnumerable<T>
             throw new InvalidOperationException("Collection was modified; operation cannot be continued.");
     }
 
-    private (Node? previousNode, Node? targetNode, int depth) _find(IndexedPredicate<T> indexedPredicate)
+    private (Node? previousNode, Node? targetNode, int depth) Find(IndexedPredicate<T> indexedPredicate)
     {
         if (Count == 0)
             return (null, null, -1);

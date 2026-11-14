@@ -36,7 +36,7 @@ public sealed class SinglyLinkedListTests
         list.Values.AddLast(3);
 
         // Assert
-        Assert.Equal(new[] { 1, 2, 3 }, list);
+        Assert.Equal([1, 2, 3], list);
         Assert.Equal(3, list.Count);
         Assert.True(list.Values.TryFirst(out int first));
         Assert.True(list.Values.TryLast(out int last));
@@ -133,7 +133,7 @@ public sealed class SinglyLinkedListTests
         Assert.False(list.Values.TryLast(out _));
         list.Values.AddFirst(7);
         list.Values.AddLast(8);
-        Assert.Equal(new[] { 7, 8 }, list);
+        Assert.Equal([7, 8], list);
     }
 
     [Fact]

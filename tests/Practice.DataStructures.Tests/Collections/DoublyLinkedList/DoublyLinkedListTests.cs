@@ -37,8 +37,8 @@ public sealed class DoublyLinkedListTests
         list.AddLast(3);
 
         // Assert
-        Assert.Equal(new[] { 1, 2, 3 }, list);
-        Assert.Equal(new[] { 3, 2, 1 }, list.Reverse());
+        Assert.Equal([1, 2, 3], list);
+        Assert.Equal([3, 2, 1], list.Reverse());
         Assert.True(list.TryRemoveLast(out int last));
         Assert.Equal(3, last);
         Assert.True(list.TryRemoveFirst(out int first));

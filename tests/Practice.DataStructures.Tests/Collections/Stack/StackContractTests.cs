@@ -284,7 +284,7 @@ public abstract class StackContractTests
 
         // Assert
         Assert.Equal([(2, 2), (2, 1), (1, 2), (1, 1)], pairs);
-        Assert.Equal([2, 1], stack.ToArray());
+        Assert.Equal([2, 1], [.. stack]);
     }
 
     [Fact]
@@ -351,7 +351,7 @@ public abstract class StackContractTests
         // Assert
         Assert.False(enumerator.MoveNext());
         Assert.Throws<InvalidOperationException>(() => enumerator.Current);
-        Assert.Equal([1], stack.ToArray());
+        Assert.Equal([1], [.. stack]);
     }
 
     [Theory]

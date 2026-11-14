@@ -107,8 +107,8 @@ public sealed class DoublyLinkedListEnumerationTests
         list.AddLast(2);
 
         // Act / Assert
-        Assert.Equal(new[] { 2, 1 }, reverse);
-        Assert.Equal(new[] { 2, 1 }, reverse);
+        Assert.Equal([2, 1], reverse);
+        Assert.Equal([2, 1], reverse);
         using IEnumerator<int> first = reverse.GetEnumerator();
         using IEnumerator<int> second = reverse.GetEnumerator();
         Assert.True(first.MoveNext());

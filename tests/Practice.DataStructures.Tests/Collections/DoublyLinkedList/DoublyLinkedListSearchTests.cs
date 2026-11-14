@@ -25,9 +25,9 @@ public sealed class DoublyLinkedListSearchTests
         // Assert
         DoublyLinkedList<int>.Cursor cursor = Assert.IsType<DoublyLinkedList<int>.Cursor>(result);
         Assert.Equal(2, cursor.Value);
-        Assert.Equal(backwards ? new[] { 4, 3 } : new[] { 0, 1 }, positions);
+        Assert.Equal(backwards ? [4, 3] : [0, 1], positions);
         cursor.Value = 9;
-        Assert.Equal(backwards ? new[] { 1, 2, 3, 9, 5 } : new[] { 1, 9, 3, 2, 5 }, list);
+        Assert.Equal(backwards ? [1, 2, 3, 9, 5] : [1, 9, 3, 2, 5], list);
     }
 
     [Theory]
@@ -49,7 +49,7 @@ public sealed class DoublyLinkedListSearchTests
 
         // Assert
         Assert.Null(result);
-        Assert.Equal(backwards ? new[] { 4, 3, 2, 1, 0 } : new[] { 0, 1, 2, 3, 4 }, positions);
+        Assert.Equal(backwards ? [4, 3, 2, 1, 0] : [0, 1, 2, 3, 4], positions);
     }
 
     [Theory]

@@ -36,7 +36,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
         public bool AddAfter(IndexedPredicate<T> indexedPredicate, T item)
         {
-            var (_, targetNode, _) = _owner._find(indexedPredicate);
+            var (_, targetNode, _) = _owner.Find(indexedPredicate);
             if (targetNode is null)
                 return false;
 
@@ -52,7 +52,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
         public bool AddBefore(IndexedPredicate<T> indexedPredicate, T item)
         {
-            var (previousNode, targetNode, _) = _owner._find(indexedPredicate);
+            var (previousNode, targetNode, _) = _owner.Find(indexedPredicate);
             if (targetNode is null)
                 return false;
 
@@ -85,7 +85,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
         public bool TryFindFirst(IndexedPredicate<T> indexedPredicate, [MaybeNullWhen(false)] out T value)
         {
-            var (_, targetNode, _) = _owner._find(indexedPredicate);
+            var (_, targetNode, _) = _owner.Find(indexedPredicate);
 
             value = targetNode is null ? default : targetNode.Value;
             return targetNode is not null;
@@ -99,7 +99,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
         public bool ReplaceFirst(IndexedPredicate<T> indexedPredicate, T newItem)
         {
-            var (_, targetNode, _) = _owner._find(indexedPredicate);
+            var (_, targetNode, _) = _owner.Find(indexedPredicate);
             if (targetNode is null)
                 return false;
 
@@ -125,7 +125,7 @@ public sealed partial class SinglyLinkedList<T>
                 throw new NotSupportedException(
                     "UpdateFirst only supports reference element types.");
 
-            var (_, targetNode, _) = _owner._find(indexedPredicate);
+            var (_, targetNode, _) = _owner.Find(indexedPredicate);
             if (targetNode is null)
                 return false;
 
@@ -144,7 +144,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
         public bool RemoveFirst(IndexedPredicate<T> indexedPredicate)
         {
-            var (previousNode, targetNode, _) = _owner._find(indexedPredicate);
+            var (previousNode, targetNode, _) = _owner.Find(indexedPredicate);
             if (targetNode is null)
                 return false;
 
@@ -158,7 +158,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
         public int PositionOf(IndexedPredicate<T> indexedPredicate)
         {
-            var (_, _, depth) = _owner._find(indexedPredicate);
+            var (_, _, depth) = _owner.Find(indexedPredicate);
 
             return depth;
         }
@@ -169,7 +169,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
         public bool Contains(IndexedPredicate<T> indexedPredicate)
         {
-            var (_, targetNode, _) = _owner._find(indexedPredicate);
+            var (_, targetNode, _) = _owner.Find(indexedPredicate);
 
             return targetNode is not null;
         }

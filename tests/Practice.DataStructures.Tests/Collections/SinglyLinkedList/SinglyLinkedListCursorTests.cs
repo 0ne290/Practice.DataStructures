@@ -20,7 +20,7 @@ public sealed class SinglyLinkedListCursorTests
         // Assert
         Assert.Same(values, list.Values);
         Assert.Same(cursors, list.Cursors);
-        Assert.Equal(new[] { 1, 2 }, list);
+        Assert.Equal([1, 2], list);
         Assert.Equal(2, list.Count);
         Assert.True(values.Contains((value, _) => value == 1));
         Assert.Null(typeof(SinglyLinkedList<int>).GetMethod("AddFirst"));
@@ -79,9 +79,9 @@ public sealed class SinglyLinkedListCursorTests
         Assert.Equal(expected, list);
         Assert.True(cursor.TryRemoveAfter(out int removed));
         Assert.Equal(9, removed);
-        Assert.Equal(new[] { 1, 2, 3 }, list);
+        Assert.Equal([1, 2, 3], list);
         list.Values.AddLast(4);
-        Assert.Equal(new[] { 1, 2, 3, 4 }, list);
+        Assert.Equal([1, 2, 3, 4], list);
         Assert.Equal(4, list.Count);
     }
 
@@ -136,7 +136,7 @@ public sealed class SinglyLinkedListCursorTests
         Assert.True(alias.TryRemoveAfter(out int removed));
         Assert.Equal(20, removed);
         Assert.Throws<InvalidOperationException>(() => cursor.Value);
-        Assert.Equal(new[] { 0, 10, 200, 3 }, list);
+        Assert.Equal([0, 10, 200, 3], list);
     }
 
     [Theory]

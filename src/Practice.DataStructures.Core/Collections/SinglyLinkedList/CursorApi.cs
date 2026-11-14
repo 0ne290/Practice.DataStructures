@@ -25,7 +25,7 @@ public sealed partial class SinglyLinkedList<T>
         /// <remarks>Условие и обнаружение изменений подчиняются правилам Values.TryFindFirst.</remarks>
         public Cursor? FindFirst(IndexedPredicate<T> indexedPredicate)
         {
-            var (_, node, _) = _owner._find(indexedPredicate);
+            var (_, node, _) = _owner.Find(indexedPredicate);
             return node is null ? null : new Cursor(_owner, node);
         }
     }
