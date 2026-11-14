@@ -1,9 +1,9 @@
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.DynamicArray;
+namespace Practice.DataStructures.Tests.Collections.LinearArray;
 
-public sealed class DynamicArrayTests
+public sealed class LinearArrayTests
 {
     [Fact]
     public void Constructor_Default_CreatesEmptyArray()
@@ -11,7 +11,7 @@ public sealed class DynamicArrayTests
         // Arrange
 
         // Act
-        var array = new DynamicArray<int>();
+        var array = new LinearArray<int>();
 
         // Assert
         Assert.Equal(0, array.Count);
@@ -27,7 +27,7 @@ public sealed class DynamicArrayTests
         // Arrange: capacity is supplied by the theory data.
 
         // Act
-        var array = new DynamicArray<int>(capacity);
+        var array = new LinearArray<int>(capacity);
 
         // Assert
         Assert.Equal(0, array.Count);
@@ -45,7 +45,7 @@ public sealed class DynamicArrayTests
         // Act
         Exception? exception = Record.Exception(() =>
         {
-            _ = new DynamicArray<int>(capacity);
+            _ = new LinearArray<int>(capacity);
         });
 
         // Assert
@@ -59,7 +59,7 @@ public sealed class DynamicArrayTests
     public void Add_AvailableCapacity_AppendsItemWithoutChangingCapacity(int capacity)
     {
         // Arrange
-        var array = new DynamicArray<int>(capacity);
+        var array = new LinearArray<int>(capacity);
         const int item = 42;
 
         // Act
@@ -75,7 +75,7 @@ public sealed class DynamicArrayTests
     public void Add_MinimumCapacity_GrowsWhenFull()
     {
         // Arrange
-        var array = new DynamicArray<int>(1);
+        var array = new LinearArray<int>(1);
         const int firstItem = 42;
         const int nextItem = 99;
         array.Add(firstItem);
@@ -94,7 +94,7 @@ public sealed class DynamicArrayTests
     public void Add_DefaultConstructor_AppendsItem()
     {
         // Arrange
-        var array = new DynamicArray<int>();
+        var array = new LinearArray<int>();
         const int item = -42;
 
         // Act
@@ -113,7 +113,7 @@ public sealed class DynamicArrayTests
     public void Add_RepeatedGrowth_PreservesOrderAndValues(int initialCapacity)
     {
         // Arrange
-        var array = new DynamicArray<int>(initialCapacity);
+        var array = new LinearArray<int>(initialCapacity);
         int[] expected = [.. Enumerable.Range(0, 257).Select(index => index % 17 - 8)];
 
         // Act
@@ -139,7 +139,7 @@ public sealed class DynamicArrayTests
     public void Add_IntegerValue_PreservesValue(int item)
     {
         // Arrange
-        var array = new DynamicArray<int>();
+        var array = new LinearArray<int>();
         Assert.Empty(array);
 
         // Act
@@ -157,7 +157,7 @@ public sealed class DynamicArrayTests
     public void Add_NullableReference_PreservesValue(string? item)
     {
         // Arrange
-        var array = new DynamicArray<string?>();
+        var array = new LinearArray<string?>();
         Assert.Empty(array);
 
         // Act
@@ -172,7 +172,7 @@ public sealed class DynamicArrayTests
     public void Add_ReferenceValuesWithGrowth_PreservesIdentity()
     {
         // Arrange
-        var array = new DynamicArray<object>(1);
+        var array = new LinearArray<object>(1);
         object[] expected = [new(), new(), new()];
 
         // Act
@@ -202,7 +202,7 @@ public sealed class DynamicArrayTests
     {
         // Arrange
         const int capacity = 8;
-        var array = new DynamicArray<int>(capacity);
+        var array = new LinearArray<int>(capacity);
         for (int item = 1; item <= count; item++)
         {
             array.Add(item);
@@ -234,7 +234,7 @@ public sealed class DynamicArrayTests
     {
         // Arrange
         const int capacity = 8;
-        var array = new DynamicArray<int>(capacity);
+        var array = new LinearArray<int>(capacity);
         for (int item = 1; item <= count; item++)
         {
             array.Add(item);
@@ -264,7 +264,7 @@ public sealed class DynamicArrayTests
     public void IndexerSet_ValidIndex_ReplacesOnlySelectedItem(int index)
     {
         // Arrange
-        var array = new DynamicArray<int>(8);
+        var array = new LinearArray<int>(8);
         int[] expected = [10, 20, 30];
         foreach (int item in expected)
         {

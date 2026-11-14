@@ -1,9 +1,9 @@
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.DynamicArray;
+namespace Practice.DataStructures.Tests.Collections.LinearArray;
 
-public sealed class DynamicArraySearchTests
+public sealed class LinearArraySearchTests
 {
     [Theory]
     [InlineData(10, 0)]
@@ -14,7 +14,7 @@ public sealed class DynamicArraySearchTests
     public void IndexOf_PresentOrMissingValue_ReturnsFirstIndexOrMinusOne(int item, int expected)
     {
         // Arrange
-        var array = new DynamicArray<int> { 10, 20, 10, 30 };
+        var array = new LinearArray<int> { 10, 20, 10, 30 };
 
         // Act
         int actual = array.IndexOf((value, _) => value == item);
@@ -32,7 +32,7 @@ public sealed class DynamicArraySearchTests
     public void Contains_PresentOrMissingValue_ReturnsPresence(int item, bool expected)
     {
         // Arrange
-        var array = new DynamicArray<int> { 10, 20, 10, 30 };
+        var array = new LinearArray<int> { 10, 20, 10, 30 };
 
         // Act
         bool actual = array.Contains((value, _) => value == item);
@@ -50,7 +50,7 @@ public sealed class DynamicArraySearchTests
     {
         // Arrange
         string first = new(['f', 'i', 'r', 's', 't']);
-        var array = new DynamicArray<string?> { first, null, null, "last" };
+        var array = new LinearArray<string?> { first, null, null, "last" };
 
         // Act
         int index = array.IndexOf((value, _) => value == item);
@@ -67,7 +67,7 @@ public sealed class DynamicArraySearchTests
         // Arrange
         var stored = new SearchValue(7);
         var sought = new SearchValue(7);
-        var array = new DynamicArray<SearchValue> { new(3), stored, new(7) };
+        var array = new LinearArray<SearchValue> { new(3), stored, new(7) };
 
         // Act
         int index = array.IndexOf((value, _) => value.Equals(sought));
@@ -86,7 +86,7 @@ public sealed class DynamicArraySearchTests
     public void Search_EmptyArray_IgnoresReservedDefaultValues(bool searchNull)
     {
         // Arrange
-        var array = new DynamicArray<string?>();
+        var array = new LinearArray<string?>();
         string? item = searchNull ? null : "missing";
 
         // Act
@@ -102,7 +102,7 @@ public sealed class DynamicArraySearchTests
     public void Search_AfterRemovalAndReplacement_ReflectsCurrentContents()
     {
         // Arrange
-        var array = new DynamicArray<int>(3) { 10, 20, 30 };
+        var array = new LinearArray<int>(3) { 10, 20, 30 };
         array.RemoveAt(2);
         array[0] = 0;
 
@@ -124,7 +124,7 @@ public sealed class DynamicArraySearchTests
     public void Search_PresentAndMissingValues_PreservesArrayAndEnumerators(int position)
     {
         // Arrange
-        var array = new DynamicArray<int>(8) { 10, 20 };
+        var array = new LinearArray<int>(8) { 10, 20 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         if (position >= 1)
         {
@@ -175,7 +175,7 @@ public sealed class DynamicArraySearchTests
     public void Search_PositionCondition_VisitsInOrderAndStopsAtFirstMatch(bool containsSearch, int target, int expectedCalls)
     {
         // Arrange
-        var array = new DynamicArray<int>(8) { 10, 20, 30 };
+        var array = new LinearArray<int>(8) { 10, 20, 30 };
         var visited = new List<(int Item, int Index)>();
         bool Predicate(int item, int index)
         {
@@ -201,7 +201,7 @@ public sealed class DynamicArraySearchTests
     public void Search_EmptyArray_DoesNotInvokePredicate()
     {
         // Arrange
-        var array = new DynamicArray<int>();
+        var array = new LinearArray<int>();
         int calls = 0;
         bool Predicate(int item, int index)
         {
@@ -225,7 +225,7 @@ public sealed class DynamicArraySearchTests
         // Arrange
         var first = new SearchValue(7);
         var second = new SearchValue(7);
-        var array = new DynamicArray<SearchValue> { first, second, new(9) };
+        var array = new LinearArray<SearchValue> { first, second, new(9) };
 
         // Act
         int identityIndex = array.IndexOf((item, _) => ReferenceEquals(item, second));
@@ -244,7 +244,7 @@ public sealed class DynamicArraySearchTests
     public void Search_PredicateThrows_PropagatesSameExceptionAndPreservesState(bool containsSearch)
     {
         // Arrange
-        var array = new DynamicArray<int>(8) { 10, 20 };
+        var array = new LinearArray<int>(8) { 10, 20 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
         var expected = new ArithmeticException("Predicate failed.");
@@ -285,7 +285,7 @@ public sealed class DynamicArraySearchTests
         for (int mutation = 0; mutation < 4; mutation++)
         {
             int currentMutation = mutation;
-            var array = new DynamicArray<int>(2) { 10, 20 };
+            var array = new LinearArray<int>(2) { 10, 20 };
             int calls = 0;
             bool Predicate(int item, int index)
             {
@@ -323,7 +323,7 @@ public sealed class DynamicArraySearchTests
     public void Search_NestedSearch_PreservesOuterSearch()
     {
         // Arrange
-        var array = new DynamicArray<int> { 10, 20, 30 };
+        var array = new LinearArray<int> { 10, 20, 30 };
 
         // Act
         int index = array.IndexOf((item, position) =>

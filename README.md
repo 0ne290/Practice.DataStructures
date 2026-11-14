@@ -4,6 +4,11 @@
 деревья, представления графов, обходы, остовы, пути и сортировки.
 
 Требования и критерии приёмки: [спецификация](docs/specification.md).
+Общий словарь и базовые API: [семантика коллекций](docs/collection-semantics.md).
+Массив, список, стек, очередь и дек обозначают профили API; линейность,
+кольцевая организация и связность описывают хранение. «Классический» и
+«традиционный» ссылаются на одинаковые явно определённые профили практикума.
+
 Источник — [документ практикума](https://docs.google.com/document/d/1gc4Alrd9FbaK45gFsvVi9R8c1b2ZkauCpzki4IRLPGg/edit),
 общие правила и раздел 4, включая порядок изучения.
 
@@ -17,8 +22,8 @@
 Репозиторий, solution и префикс пространств имён: `Practice.DataStructures`.
 В решении ровно два проекта. Разделение заданий выполняется папками и
 пространствами имён внутри них по мере реализации. В Core добавлен
-`Collections/DynamicArray<T>`, `Collections/SinglyLinkedList<T>`,
-`Collections/DoublyLinkedList<T>`, `Collections/ArrayStack<T>` и
+`Collections/LinearArray<T>`, `Collections/SinglyLinkedList<T>`,
+`Collections/DoublyLinkedList<T>`, `Collections/LinearStack<T>` и
 `Collections/LinkedStack<T>`. Tests проверяет их публичные контракты
 и загрузку Core как библиотеки.
 

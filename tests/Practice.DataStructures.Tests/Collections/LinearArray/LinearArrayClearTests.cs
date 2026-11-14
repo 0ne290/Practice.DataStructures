@@ -1,9 +1,9 @@
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.DynamicArray;
+namespace Practice.DataStructures.Tests.Collections.LinearArray;
 
-public sealed class DynamicArrayClearTests
+public sealed class LinearArrayClearTests
 {
     [Theory]
     [InlineData(1, 0)]
@@ -14,7 +14,7 @@ public sealed class DynamicArrayClearTests
     public void Clear_EmptyOrPopulatedArray_PreservesCapacityAndSupportsReuse(int capacity, int count)
     {
         // Arrange
-        var array = new DynamicArray<int>(capacity);
+        var array = new LinearArray<int>(capacity);
         for (int item = 0; item < count; item++)
         {
             array.Add(item);
@@ -57,7 +57,7 @@ public sealed class DynamicArrayClearTests
     public void Clear_AnyEnumerationPosition_InvalidatesOldEnumerators(int count, int position)
     {
         // Arrange
-        var array = new DynamicArray<int>();
+        var array = new LinearArray<int>();
         for (int item = 0; item < count; item++)
         {
             array.Add(item);

@@ -17,7 +17,7 @@ namespace Practice.DataStructures.Core.Collections;
 /// Правила обнаружения изменений при обходе описаны у <see cref="GetEnumerator"/>.
 /// </para>
 /// </remarks>
-public sealed class DynamicArray<T> : IEnumerable<T>
+public sealed class LinearArray<T> : IEnumerable<T>
 {
     private T[] _array;
     private int _version;
@@ -28,7 +28,7 @@ public sealed class DynamicArray<T> : IEnumerable<T>
     /// <paramref name="capacity"/> меньше единицы.
     /// </exception>
     /// <exception cref="OutOfMemoryException">Не удалось выделить внутренний массив.</exception>
-    public DynamicArray(int capacity)
+    public LinearArray(int capacity)
     {
         if (capacity < 1)
             throw new ArgumentOutOfRangeException(nameof(capacity), capacity, "Capacity must be greater than zero.");
@@ -40,7 +40,7 @@ public sealed class DynamicArray<T> : IEnumerable<T>
     }
 
     /// <summary>Создаёт пустой массив с начальной вместимостью 8 элементов.</summary>
-    public DynamicArray() : this(8) { }
+    public LinearArray() : this(8) { }
 
     /// <summary>Получает количество сохранённых элементов за <c>O(1)</c>.</summary>
     /// <value>Число от нуля до <see cref="Capacity"/> включительно.</value>
@@ -246,11 +246,11 @@ public sealed class DynamicArray<T> : IEnumerable<T>
     /// <summary>Хранит позицию обхода и версию списка на момент получения перечислителя.</summary>
     private sealed class Enumerator : IEnumerator<T>
     {
-        private readonly DynamicArray<T> _owner;
+        private readonly LinearArray<T> _owner;
         private readonly int _expectedVersion;
         private int _index;
 
-        internal Enumerator(DynamicArray<T> owner)
+        internal Enumerator(LinearArray<T> owner)
         {
             _owner = owner;
             _expectedVersion = owner._version;

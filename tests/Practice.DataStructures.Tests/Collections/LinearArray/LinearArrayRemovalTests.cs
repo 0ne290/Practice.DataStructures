@@ -1,9 +1,9 @@
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.DynamicArray;
+namespace Practice.DataStructures.Tests.Collections.LinearArray;
 
-public sealed class DynamicArrayRemovalTests
+public sealed class LinearArrayRemovalTests
 {
     [Theory]
     [InlineData(1, 1, 0)]
@@ -17,7 +17,7 @@ public sealed class DynamicArrayRemovalTests
     public void RemoveAt_ValidIndex_PreservesOrderAndCapacity(int capacity, int count, int index)
     {
         // Arrange
-        var array = new DynamicArray<int>(capacity);
+        var array = new LinearArray<int>(capacity);
         var expected = new List<int>();
         for (int item = 1; item <= count; item++)
         {
@@ -49,7 +49,7 @@ public sealed class DynamicArrayRemovalTests
     {
         // Arrange
         object repeated = new();
-        var array = new DynamicArray<object?> { repeated, null, repeated, new() };
+        var array = new LinearArray<object?> { repeated, null, repeated, new() };
         var expected = new List<object?>(array);
         expected.RemoveAt(index);
         int originalCapacity = array.Capacity;
@@ -83,7 +83,7 @@ public sealed class DynamicArrayRemovalTests
         // Arrange
         const int capacity = 8;
         int[] expected = [.. Enumerable.Range(1, count)];
-        var array = new DynamicArray<int>(capacity);
+        var array = new LinearArray<int>(capacity);
         foreach (int item in expected)
         {
             array.Add(item);
@@ -110,7 +110,7 @@ public sealed class DynamicArrayRemovalTests
     public void RemoveAt_RepeatedUntilEmpty_PreservesCapacityAndSupportsReuse(int initialCapacity)
     {
         // Arrange
-        var array = new DynamicArray<int>(initialCapacity) { 10, 20, 30, 40, 50 };
+        var array = new LinearArray<int>(initialCapacity) { 10, 20, 30, 40, 50 };
         var expected = new List<int>(array);
         int originalCapacity = array.Capacity;
 
@@ -145,7 +145,7 @@ public sealed class DynamicArrayRemovalTests
     public void RemoveAt_FollowedByAddAndGrowth_PreservesRemainingAndNewItems(int index)
     {
         // Arrange
-        var array = new DynamicArray<int>(3) { 10, 20, 30 };
+        var array = new LinearArray<int>(3) { 10, 20, 30 };
         var expected = new List<int>(array);
         expected.RemoveAt(index);
         expected.Add(40);

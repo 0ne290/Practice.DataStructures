@@ -2,13 +2,13 @@ using System.Globalization;
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.DynamicArray;
+namespace Practice.DataStructures.Tests.Collections.LinearArray;
 
-public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
+public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
 {
     [Fact]
     [Trait("Category", "Laboratory")]
-    public void DynamicArray_RandomData_DemonstratesGrowthAndIndexedAccess()
+    public void LinearArray_RandomData_DemonstratesGrowthAndIndexedAccess()
     {
         // Arrange
         const string seedEnvironmentVariable = "DATASTRUCTURES_LAB_SEED";
@@ -31,13 +31,13 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         }
 
         string seedSource = suppliedSeed is null ? "новый случайный" : seedEnvironmentVariable;
-        output.WriteLine("DynamicArray<int>: добавление, рост, перебор, чтение, замена и удаление");
+        output.WriteLine("LinearArray<int>: добавление, рост, перебор, чтение, замена и удаление");
         output.WriteLine($"Seed={seed} ({seedSource}); начальная вместимость={initialCapacity}; элементов={itemCount}; замен={replacementCount}; случайных удалений={removalCount}");
         output.WriteLine($"Повторить этот прогон: --environment {seedEnvironmentVariable}={seed}");
         output.WriteLine($"Диапазон значений: [{minimumValue}, {maximumValue}]; значения для замены: [100, 199]");
 
         var random = new Random(seed);
-        var array = new DynamicArray<int>(initialCapacity);
+        var array = new LinearArray<int>(initialCapacity);
         int[] expected = new int[itemCount];
         for (int index = 0; index < expected.Length; index++)
         {
@@ -208,7 +208,7 @@ public sealed class DynamicArrayLaboratoryTests(ITestOutputHelper output)
         output.WriteLine("");
         output.WriteLine("8. Проверяем недопустимые аргументы");
         ArgumentOutOfRangeException capacityException = Assert.Throws<ArgumentOutOfRangeException>(
-            "capacity", () => new DynamicArray<int>(0));
+            "capacity", () => new LinearArray<int>(0));
         output.WriteLine($"Вместимость 0: {capacityException.GetType().Name}, параметр '{capacityException.ParamName}'");
 
         ArgumentOutOfRangeException indexException = Assert.Throws<ArgumentOutOfRangeException>("index", () =>

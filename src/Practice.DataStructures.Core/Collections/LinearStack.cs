@@ -8,9 +8,9 @@ namespace Practice.DataStructures.Core.Collections;
 /// Допускаются дубликаты и значения по умолчанию, включая null для ссылочных типов.
 /// Коллекция не обеспечивает синхронизацию доступа из нескольких потоков.
 /// </remarks>
-public sealed class ArrayStack<T> : IEnumerable<T>
+public sealed class LinearStack<T> : IEnumerable<T>
 {
-    private readonly DynamicArray<T> _array = [];
+    private readonly LinearArray<T> _array = [];
     private int _version;
 
     /// <summary>Получает количество элементов за O(1).</summary>
@@ -77,7 +77,7 @@ public sealed class ArrayStack<T> : IEnumerable<T>
     /// <inheritdoc cref="GetEnumerator"/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private sealed class Enumerator(ArrayStack<T> owner) : IEnumerator<T>
+    private sealed class Enumerator(LinearStack<T> owner) : IEnumerator<T>
     {
         private readonly int _expectedVersion = owner._version;
         private int _index = owner.Count;

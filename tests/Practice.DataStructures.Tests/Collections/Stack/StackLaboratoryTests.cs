@@ -31,7 +31,7 @@ public sealed class StackLaboratoryTests(ITestOutputHelper output)
         var random = new Random(seed);
         int[] input = [.. Enumerable.Range(0, count).Select(_ => random.Next(minimum, maximum + 1))];
         output.WriteLine($"Вход: [{string.Join(", ", input)}]");
-        var stack = new ArrayStack<int>();
+        var stack = new LinearStack<int>();
 
         // Act / Assert: заполнение и чтение вершины.
         Assert.True(stack.IsEmpty);
