@@ -2,9 +2,9 @@ using System.Reflection;
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.LinearArray;
+namespace Practice.DataStructures.Tests.Collections.ArrayList;
 
-public sealed class LinearArrayStorageTests
+public sealed class ArrayListStorageTests
 {
     [Theory]
     [InlineData(0)]
@@ -13,7 +13,7 @@ public sealed class LinearArrayStorageTests
     public void RemoveAt_ReferenceType_ClearsVacatedSlot(int index)
     {
         // Arrange
-        var array = new LinearArray<object>(3) { new(), new(), new() };
+        var array = new ArrayList<object>(3) { new(), new(), new() };
         int vacatedIndex = array.Count - 1;
 
         // Act
@@ -30,7 +30,7 @@ public sealed class LinearArrayStorageTests
     public void RemoveAt_ValueType_ClearsVacatedSlot(int index)
     {
         // Arrange
-        var array = new LinearArray<int>(3) { 10, 20, 30 };
+        var array = new ArrayList<int>(3) { 10, 20, 30 };
         int vacatedIndex = array.Count - 1;
 
         // Act
@@ -47,7 +47,7 @@ public sealed class LinearArrayStorageTests
     public void RemoveAt_StructContainingReference_ClearsVacatedSlot(int index)
     {
         // Arrange
-        var array = new LinearArray<(object? Reference, int Value)>(3)
+        var array = new ArrayList<(object? Reference, int Value)>(3)
         {
             (new object(), 10),
             (new object(), 20),
@@ -68,7 +68,7 @@ public sealed class LinearArrayStorageTests
     public void Clear_ReferenceType_ClearsOccupiedSlots()
     {
         // Arrange
-        var array = new LinearArray<object?>(4) { new(), null, new() };
+        var array = new ArrayList<object?>(4) { new(), null, new() };
 
         // Act
         array.Clear();
@@ -81,7 +81,7 @@ public sealed class LinearArrayStorageTests
     public void Clear_ValueType_ClearsOccupiedSlots()
     {
         // Arrange
-        var array = new LinearArray<int>(4) { 10, 20, 30 };
+        var array = new ArrayList<int>(4) { 10, 20, 30 };
 
         // Act
         array.Clear();
@@ -94,7 +94,7 @@ public sealed class LinearArrayStorageTests
     public void Clear_StructContainingReference_ClearsOccupiedSlots()
     {
         // Arrange
-        var array = new LinearArray<(object? Reference, int Value)>(4)
+        var array = new ArrayList<(object? Reference, int Value)>(4)
         {
             (new object(), 10),
             (new object(), 20),
@@ -112,10 +112,10 @@ public sealed class LinearArrayStorageTests
         }
     }
 
-    private static T[] GetStorage<T>(LinearArray<T> array)
+    private static T[] GetStorage<T>(ArrayList<T> array)
     {
         // Проверка внутреннего инварианта отделена от тестов публичного контракта.
-        FieldInfo? storageField = typeof(LinearArray<T>).GetField("_array", BindingFlags.Instance | BindingFlags.NonPublic);
+        FieldInfo? storageField = typeof(ArrayList<T>).GetField("_array", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(storageField);
         return Assert.IsType<T[]>(storageField.GetValue(array));
     }

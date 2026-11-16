@@ -1,9 +1,9 @@
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.LinearArray;
+namespace Practice.DataStructures.Tests.Collections.ArrayList;
 
-public sealed class LinearArrayClearTests
+public sealed class ArrayListClearTests
 {
     [Theory]
     [InlineData(1, 0)]
@@ -11,10 +11,10 @@ public sealed class LinearArrayClearTests
     [InlineData(2, 7)]
     [InlineData(8, 3)]
     [InlineData(8, 8)]
-    public void Clear_EmptyOrPopulatedArray_PreservesCapacityAndSupportsReuse(int capacity, int count)
+    public void Clear_EmptyOrPopulatedList_PreservesCapacityAndSupportsReuse(int capacity, int count)
     {
         // Arrange
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
         for (int item = 0; item < count; item++)
         {
             array.Add(item);
@@ -57,7 +57,7 @@ public sealed class LinearArrayClearTests
     public void Clear_AnyEnumerationPosition_InvalidatesOldEnumerators(int count, int position)
     {
         // Arrange
-        var array = new LinearArray<int>();
+        var array = new ArrayList<int>();
         for (int item = 0; item < count; item++)
         {
             array.Add(item);

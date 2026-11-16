@@ -1,9 +1,9 @@
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.LinearArray;
+namespace Practice.DataStructures.Tests.Collections.ArrayList;
 
-public sealed class LinearArrayRemovalTests
+public sealed class ArrayListRemovalTests
 {
     [Theory]
     [InlineData(1, 1, 0)]
@@ -17,7 +17,7 @@ public sealed class LinearArrayRemovalTests
     public void RemoveAt_ValidIndex_PreservesOrderAndCapacity(int capacity, int count, int index)
     {
         // Arrange
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
         var expected = new List<int>();
         for (int item = 1; item <= count; item++)
         {
@@ -49,7 +49,7 @@ public sealed class LinearArrayRemovalTests
     {
         // Arrange
         object repeated = new();
-        var array = new LinearArray<object?> { repeated, null, repeated, new() };
+        var array = new ArrayList<object?> { repeated, null, repeated, new() };
         var expected = new List<object?>(array);
         expected.RemoveAt(index);
         int originalCapacity = array.Capacity;
@@ -78,12 +78,12 @@ public sealed class LinearArrayRemovalTests
     [InlineData(3, 7)]
     [InlineData(3, int.MinValue)]
     [InlineData(3, int.MaxValue)]
-    public void RemoveAt_InvalidIndex_ThrowsWithoutChangingArray(int count, int index)
+    public void RemoveAt_InvalidIndex_ThrowsWithoutChangingList(int count, int index)
     {
         // Arrange
         const int capacity = 8;
         int[] expected = [.. Enumerable.Range(1, count)];
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
         foreach (int item in expected)
         {
             array.Add(item);
@@ -110,7 +110,7 @@ public sealed class LinearArrayRemovalTests
     public void RemoveAt_RepeatedUntilEmpty_PreservesCapacityAndSupportsReuse(int initialCapacity)
     {
         // Arrange
-        var array = new LinearArray<int>(initialCapacity) { 10, 20, 30, 40, 50 };
+        var array = new ArrayList<int>(initialCapacity) { 10, 20, 30, 40, 50 };
         var expected = new List<int>(array);
         int originalCapacity = array.Capacity;
 
@@ -128,7 +128,7 @@ public sealed class LinearArrayRemovalTests
 
         Assert.Empty(array);
 
-        // Act: повторное использование опустевшего массива.
+        // Act: повторное использование опустевшего списка.
         array.Add(99);
 
         // Assert
@@ -145,7 +145,7 @@ public sealed class LinearArrayRemovalTests
     public void RemoveAt_FollowedByAddAndGrowth_PreservesRemainingAndNewItems(int index)
     {
         // Arrange
-        var array = new LinearArray<int>(3) { 10, 20, 30 };
+        var array = new ArrayList<int>(3) { 10, 20, 30 };
         var expected = new List<int>(array);
         expected.RemoveAt(index);
         expected.Add(40);

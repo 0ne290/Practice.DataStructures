@@ -2,15 +2,19 @@ using System.Collections;
 
 namespace Practice.DataStructures.Core.Collections;
 
-/// <summary>Стек LIFO на собственном динамическом массиве.</summary>
+/// <summary>Стек LIFO на массиве с хранилищем в собственном расширяемом списке <see cref="ArrayList{T}"/>.</summary>
 /// <typeparam name="T">Тип элементов.</typeparam>
 /// <remarks>
+/// Доступ к элементам ограничен вершиной: доступны добавление, чтение и извлечение вершины,
+/// очистка и перебор от вершины к основанию. Индексатор внутреннего списка не открывается.
+/// Вместимость растёт автоматически при добавлении и сохраняется при удалении и очистке.
+/// Сложность операций указана у соответствующих членов.
 /// Допускаются дубликаты и значения по умолчанию, включая null для ссылочных типов.
 /// Коллекция не обеспечивает синхронизацию доступа из нескольких потоков.
 /// </remarks>
-public sealed class LinearStack<T> : IEnumerable<T>
+public sealed class ArrayStack<T> : IEnumerable<T>
 {
-    private readonly LinearArray<T> _array = [];
+    private readonly ArrayList<T> _array = [];
     private int _version;
 
     /// <summary>Получает количество элементов за O(1).</summary>
@@ -21,7 +25,7 @@ public sealed class LinearStack<T> : IEnumerable<T>
 
     /// <summary>Добавляет элемент на вершину.</summary>
     /// <param name="item">Добавляемый элемент.</param>
-    /// <remarks>Амортизированная сложность — O(1), при росте массива — O(n).</remarks>
+    /// <remarks>Амортизированная сложность — O(1), при расширении хранилища — O(n).</remarks>
     /// <exception cref="OutOfMemoryException">Не удалось выделить хранилище.</exception>
     public void Push(T item)
     {
@@ -77,7 +81,7 @@ public sealed class LinearStack<T> : IEnumerable<T>
     /// <inheritdoc cref="GetEnumerator"/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private sealed class Enumerator(LinearStack<T> owner) : IEnumerator<T>
+    private sealed class Enumerator(ArrayStack<T> owner) : IEnumerator<T>
     {
         private readonly int _expectedVersion = owner._version;
         private int _index = owner.Count;

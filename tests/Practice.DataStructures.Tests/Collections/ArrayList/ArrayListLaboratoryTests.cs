@@ -2,13 +2,13 @@ using System.Globalization;
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.LinearArray;
+namespace Practice.DataStructures.Tests.Collections.ArrayList;
 
-public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
+public sealed class ArrayListLaboratoryTests(ITestOutputHelper output)
 {
     [Fact]
     [Trait("Category", "Laboratory")]
-    public void LinearArray_RandomData_DemonstratesGrowthAndIndexedAccess()
+    public void ArrayList_RandomData_DemonstratesGrowthAndIndexedAccess()
     {
         // Arrange
         const string seedEnvironmentVariable = "DATASTRUCTURES_LAB_SEED";
@@ -31,13 +31,13 @@ public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
         }
 
         string seedSource = suppliedSeed is null ? "новый случайный" : seedEnvironmentVariable;
-        output.WriteLine("LinearArray<int>: добавление, рост, перебор, чтение, замена и удаление");
+        output.WriteLine("ArrayList<int>: добавление, рост, перебор, чтение, замена и удаление");
         output.WriteLine($"Seed={seed} ({seedSource}); начальная вместимость={initialCapacity}; элементов={itemCount}; замен={replacementCount}; случайных удалений={removalCount}");
         output.WriteLine($"Повторить этот прогон: --environment {seedEnvironmentVariable}={seed}");
         output.WriteLine($"Диапазон значений: [{minimumValue}, {maximumValue}]; значения для замены: [100, 199]");
 
         var random = new Random(seed);
-        var array = new LinearArray<int>(initialCapacity);
+        var array = new ArrayList<int>(initialCapacity);
         int[] expected = new int[itemCount];
         for (int index = 0; index < expected.Length; index++)
         {
@@ -45,7 +45,7 @@ public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
         }
 
         output.WriteLine($"Исходные данные: [{string.Join(", ", expected)}]");
-        output.WriteLine($"Пустой массив: Count={array.Count}, Capacity={array.Capacity}");
+        output.WriteLine($"Пустой список: Count={array.Count}, Capacity={array.Capacity}");
         Assert.Equal(0, array.Count);
         Assert.Equal(initialCapacity, array.Capacity);
         Assert.Empty(array);
@@ -181,7 +181,7 @@ public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
 
         // Act / Assert: удаление всех элементов не меняет вместимость.
         output.WriteLine("");
-        output.WriteLine("7. Удаляем оставшиеся элементы с конца и используем массив повторно");
+        output.WriteLine("7. Удаляем оставшиеся элементы с конца и используем список повторно");
         while (removalReference.Count > 0)
         {
             int lastIndex = removalReference.Count - 1;
@@ -202,13 +202,13 @@ public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(capacityBeforeRemoval, array.Capacity);
         Assert.Equal(reusedValue, array[0]);
         Assert.Equal(removalReference, array);
-        output.WriteLine($"Add({reusedValue}): Count={array.Count}, Capacity={array.Capacity}; массив снова используется.");
+        output.WriteLine($"Add({reusedValue}): Count={array.Count}, Capacity={array.Capacity}; список снова используется.");
 
         // Act / Assert: ожидаемые ошибки аргументов.
         output.WriteLine("");
         output.WriteLine("8. Проверяем недопустимые аргументы");
         ArgumentOutOfRangeException capacityException = Assert.Throws<ArgumentOutOfRangeException>(
-            "capacity", () => new LinearArray<int>(0));
+            "capacity", () => new ArrayList<int>(0));
         output.WriteLine($"Вместимость 0: {capacityException.GetType().Name}, параметр '{capacityException.ParamName}'");
 
         ArgumentOutOfRangeException indexException = Assert.Throws<ArgumentOutOfRangeException>("index", () =>
@@ -266,7 +266,7 @@ public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
 
         // Act / Assert: очистка и повторное использование.
         output.WriteLine("");
-        output.WriteLine("10. Очищаем массив с сохранением вместимости");
+        output.WriteLine("10. Очищаем список с сохранением вместимости");
         using (IEnumerator<int> iterator = array.GetEnumerator())
         {
             array.Clear();
@@ -291,7 +291,7 @@ public sealed class LinearArrayLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(reusedValue, Assert.Single(array));
         Assert.Equal(1, array.Count);
         Assert.Equal(capacityBeforeRemoval, array.Capacity);
-        output.WriteLine($"Повторная очистка пустого массива инвалидировала обход; Add({reusedValue}) снова работает.");
+        output.WriteLine($"Повторная очистка пустого списка инвалидировала обход; Add({reusedValue}) снова работает.");
         output.WriteLine("");
         output.WriteLine("Эксперимент завершён. Все проверки пройдены.");
     }

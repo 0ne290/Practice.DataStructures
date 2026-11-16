@@ -3,7 +3,7 @@ using System.Collections;
 namespace Practice.DataStructures.Core.Collections;
 
 /// <summary>
-/// Динамический массив с добавлением в конец, доступом и удалением по индексу и перебором элементов.
+/// Расширяемый список на массиве с добавлением в конец, доступом и удалением по индексу и перебором элементов.
 /// </summary>
 /// <typeparam name="T">Тип хранимых элементов.</typeparam>
 /// <remarks>
@@ -13,22 +13,28 @@ namespace Practice.DataStructures.Core.Collections;
 /// Допускаются повторяющиеся элементы и значения по умолчанию для <typeparamref name="T"/>.
 /// </para>
 /// <para>
+/// При заполнении хранилища вместимость автоматически увеличивается с сохранением элементов.
+/// Добавление поддерживается только в конец; вставки в произвольную позицию и курсоров нет.
+/// Поиск получает элемент и его текущую позицию; чтение и замена по индексу выполняются напрямую.
+/// Сложность операций указана у соответствующих членов.
+/// </para>
+/// <para>
 /// Коллекция не обеспечивает синхронизацию доступа из нескольких потоков.
 /// Правила обнаружения изменений при обходе описаны у <see cref="GetEnumerator"/>.
 /// </para>
 /// </remarks>
-public sealed class LinearArray<T> : IEnumerable<T>
+public sealed class ArrayList<T> : IEnumerable<T>
 {
     private T[] _array;
     private int _version;
 
-    /// <summary>Создаёт пустой массив с заданной начальной вместимостью.</summary>
+    /// <summary>Создаёт пустой список на массиве с заданной начальной вместимостью.</summary>
     /// <param name="capacity">Начальная вместимость, не меньше единицы.</param>
     /// <exception cref="ArgumentOutOfRangeException">
     /// <paramref name="capacity"/> меньше единицы.
     /// </exception>
     /// <exception cref="OutOfMemoryException">Не удалось выделить внутренний массив.</exception>
-    public LinearArray(int capacity)
+    public ArrayList(int capacity)
     {
         if (capacity < 1)
             throw new ArgumentOutOfRangeException(nameof(capacity), capacity, "Capacity must be greater than zero.");
@@ -39,14 +45,14 @@ public sealed class LinearArray<T> : IEnumerable<T>
         _version = 0;
     }
 
-    /// <summary>Создаёт пустой массив с начальной вместимостью 8 элементов.</summary>
-    public LinearArray() : this(8) { }
+    /// <summary>Создаёт пустой список на массиве с начальной вместимостью 8 элементов.</summary>
+    public ArrayList() : this(8) { }
 
     /// <summary>Получает количество сохранённых элементов за <c>O(1)</c>.</summary>
     /// <value>Число от нуля до <see cref="Capacity"/> включительно.</value>
     public int Count { get; private set; }
 
-    /// <summary>Получает количество элементов, помещающихся без увеличения массива.</summary>
+    /// <summary>Получает количество элементов, помещающихся без расширения хранилища списка.</summary>
     /// <value>Длина внутреннего массива, не меньше <see cref="Count"/>.</value>
     /// <remarks>Чтение свойства выполняется за <c>O(1)</c>.</remarks>
     public int Capacity { get; private set; }
@@ -82,13 +88,13 @@ public sealed class LinearArray<T> : IEnumerable<T>
         }
     }
 
-    /// <summary>Добавляет элемент в конец массива, сохраняя порядок предыдущих элементов.</summary>
+    /// <summary>Добавляет элемент в конец списка, сохраняя порядок предыдущих элементов.</summary>
     /// <param name="item">Добавляемый элемент.</param>
     /// <exception cref="OutOfMemoryException">Не удалось выделить массив большей вместимости.</exception>
     /// <remarks>
     /// <para>
     /// При заполнении хранилища вместимость автоматически увеличивается.
-    /// Амортизированная сложность добавления — <c>O(1)</c>; при увеличении массива —
+    /// Амортизированная сложность добавления — <c>O(1)</c>; при расширении хранилища —
     /// <c>O(n)</c>, где <c>n</c> — текущее количество элементов.
     /// </para>
     /// <para>
@@ -149,11 +155,11 @@ public sealed class LinearArray<T> : IEnumerable<T>
         _version = unchecked(_version + 1);
     }
 
-    /// <summary>Удаляет все элементы, сохраняя вместимость массива.</summary>
+    /// <summary>Удаляет все элементы, сохраняя вместимость списка.</summary>
     /// <remarks>
     /// Устанавливает <see cref="Count"/> в ноль и сохраняет <see cref="Capacity"/>.
     /// Занятые ячейки получают значения по умолчанию, чтобы не удерживать ссылки.
-    /// Каждый вызов инвалидирует перечислители, в том числе для пустого массива.
+    /// Каждый вызов инвалидирует перечислители, в том числе для пустого списка.
     /// Сложность — <c>O(n)</c>, дополнительная память — <c>O(1)</c>.
     /// </remarks>
     public void Clear()
@@ -170,15 +176,15 @@ public sealed class LinearArray<T> : IEnumerable<T>
     /// <remarks>
     /// Проверяет элементы слева направо, исключая резерв. Условие вызывается один раз
     /// для каждой посещённой позиции; после первого совпадения поиск прекращается.
-    /// Без изменений из условия сохраняет состояние массива и перечислителей.
-    /// После каждого нормально завершившегося вызова условия проверяет версию массива;
+    /// Без изменений из условия сохраняет состояние списка и перечислителей.
+    /// После каждого нормально завершившегося вызова условия проверяет версию списка;
     /// изменения из условия обнаруживаются, но не откатываются. Исключения условия
     /// передаются вызывающему коду. Чтение и вложенный поиск разрешены.
     /// Проверка аргумента на <see langword="null"/> не выполняется; поведение при
     /// нарушении этого предусловия не гарантируется.
     /// Сложность — <c>O(n)</c> при постоянной стоимости условия, дополнительная память — <c>O(1)</c>.
     /// </remarks>
-    /// <exception cref="InvalidOperationException">Условие изменило массив и вернуло результат.</exception>
+    /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
     public int IndexOf(IndexedPredicate<T> indexedPredicate)
     {
         var versionSnapshot = _version;
@@ -205,7 +211,7 @@ public sealed class LinearArray<T> : IEnumerable<T>
     /// на <see langword="null"/>; поведение при нарушении предусловия не гарантируется.
     /// Сложность — <c>O(n)</c> при постоянной стоимости условия, дополнительная память — <c>O(1)</c>.
     /// </remarks>
-    /// <exception cref="InvalidOperationException">Условие изменило массив и вернуло результат.</exception>
+    /// <exception cref="InvalidOperationException">Условие изменило список и вернуло результат.</exception>
     public bool Contains(IndexedPredicate<T> indexedPredicate) => IndexOf(indexedPredicate) != -1;
 
     /// <summary>Создаёт новый перечислитель элементов в порядке индексов.</summary>
@@ -214,11 +220,11 @@ public sealed class LinearArray<T> : IEnumerable<T>
     /// <para>
     /// Получение перечислителя выполняется за <c>O(1)</c>, полный обход — за <c>O(n)</c>,
     /// где <c>n</c> — <see cref="Count"/>. Каждый обход имеет независимое состояние;
-    /// копия содержимого массива не создаётся.
+    /// копия содержимого списка не создаётся.
     /// </para>
     /// <para>
     /// Версия списка фиксируется при получении перечислителя.
-    /// Успешный вызов <see cref="Add"/>, <see cref="RemoveAt"/>, <see cref="Clear"/> (даже для пустого массива)
+    /// Успешный вызов <see cref="Add"/>, <see cref="RemoveAt"/>, <see cref="Clear"/> (даже для пустого списка)
     /// или запись через индексатор, включая запись того же значения,
     /// инвалидирует ранее полученные перечислители. Их <see cref="IEnumerator.MoveNext"/>
     /// и <see cref="IEnumerator{T}.Current"/> после этого выбрасывают
@@ -246,11 +252,11 @@ public sealed class LinearArray<T> : IEnumerable<T>
     /// <summary>Хранит позицию обхода и версию списка на момент получения перечислителя.</summary>
     private sealed class Enumerator : IEnumerator<T>
     {
-        private readonly LinearArray<T> _owner;
+        private readonly ArrayList<T> _owner;
         private readonly int _expectedVersion;
         private int _index;
 
-        internal Enumerator(LinearArray<T> owner)
+        internal Enumerator(ArrayList<T> owner)
         {
             _owner = owner;
             _expectedVersion = owner._version;

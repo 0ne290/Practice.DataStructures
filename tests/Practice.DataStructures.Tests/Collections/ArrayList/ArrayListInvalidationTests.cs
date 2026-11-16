@@ -2,9 +2,9 @@ using System.Collections;
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.LinearArray;
+namespace Practice.DataStructures.Tests.Collections.ArrayList;
 
-public sealed class LinearArrayInvalidationTests
+public sealed class ArrayListInvalidationTests
 {
     [Theory]
     [InlineData(0, 1)]
@@ -13,7 +13,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_ItemAddedBeforeFirstMove_ThrowsInvalidOperationException(int count, int capacity)
     {
         // Arrange
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
         for (int item = 0; item < count; item++)
         {
             array.Add(item);
@@ -38,7 +38,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_ItemAddedDuringEnumeration_ThrowsInvalidOperationException(int capacity)
     {
         // Arrange
-        var array = new LinearArray<int>(capacity) { 10 };
+        var array = new ArrayList<int>(capacity) { 10 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
 
@@ -61,7 +61,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_ItemAssignedDuringEnumeration_ThrowsInvalidOperationException(int index, int value)
     {
         // Arrange
-        var array = new LinearArray<int> { 10, 20 };
+        var array = new ArrayList<int> { 10, 20 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
 
@@ -80,7 +80,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_ItemAssignedAfterLastYield_ThrowsInvalidOperationException()
     {
         // Arrange
-        var array = new LinearArray<int> { 10 };
+        var array = new ArrayList<int> { 10 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
 
@@ -97,7 +97,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_ItemAddedAfterCompletion_ThrowsInvalidOperationException()
     {
         // Arrange
-        var array = new LinearArray<int> { 10 };
+        var array = new ArrayList<int> { 10 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
         Assert.False(iterator.MoveNext());
@@ -115,7 +115,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_ItemAssignedAfterCompletion_ThrowsInvalidOperationException()
     {
         // Arrange
-        var array = new LinearArray<int> { 10 };
+        var array = new ArrayList<int> { 10 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
         Assert.False(iterator.MoveNext());
@@ -133,7 +133,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_NonGenericEnumeratorInvalidated_ThrowsInvalidOperationException()
     {
         // Arrange
-        var array = new LinearArray<int> { 10 };
+        var array = new ArrayList<int> { 10 };
         IEnumerator iterator = ((IEnumerable)array).GetEnumerator();
         using var resource = iterator as IDisposable;
 
@@ -150,7 +150,7 @@ public sealed class LinearArrayInvalidationTests
     public void Current_EnumeratorInvalidated_ThrowsInvalidOperationException()
     {
         // Arrange
-        var array = new LinearArray<int> { 10, 20 };
+        var array = new ArrayList<int> { 10, 20 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
 
@@ -167,7 +167,7 @@ public sealed class LinearArrayInvalidationTests
     public void MoveNext_ReadAndRejectedWrite_DoNotInvalidateEnumerator()
     {
         // Arrange
-        var array = new LinearArray<int> { 10, 20 };
+        var array = new ArrayList<int> { 10, 20 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         Assert.True(iterator.MoveNext());
 
@@ -198,7 +198,7 @@ public sealed class LinearArrayInvalidationTests
     public void RemoveAt_EnumeratorInAnyPosition_InvalidatesMoveNextAndCurrent(int count, int index, int advanceCount)
     {
         // Arrange
-        var array = new LinearArray<int>();
+        var array = new ArrayList<int>();
         for (int item = 1; item <= count; item++)
         {
             array.Add(item);
@@ -232,7 +232,7 @@ public sealed class LinearArrayInvalidationTests
     public void RemoveAt_NonGenericEnumerator_InvalidatesMoveNextAndCurrent()
     {
         // Arrange
-        var array = new LinearArray<int> { 10, 20 };
+        var array = new ArrayList<int> { 10, 20 };
         IEnumerator iterator = ((IEnumerable)array).GetEnumerator();
         using var resource = iterator as IDisposable;
         Assert.True(iterator.MoveNext());
@@ -262,7 +262,7 @@ public sealed class LinearArrayInvalidationTests
     {
         // Arrange
         int[] expected = [.. Enumerable.Range(1, count)];
-        var array = new LinearArray<int>();
+        var array = new ArrayList<int>();
         foreach (int item in expected)
         {
             array.Add(item);
@@ -318,7 +318,7 @@ public sealed class LinearArrayInvalidationTests
     public void Current_OutsideActivePosition_ThrowsInvalidOperationException(bool completeEnumeration)
     {
         // Arrange
-        var array = new LinearArray<int> { 10 };
+        var array = new ArrayList<int> { 10 };
         using IEnumerator<int> iterator = array.GetEnumerator();
         if (completeEnumeration)
         {

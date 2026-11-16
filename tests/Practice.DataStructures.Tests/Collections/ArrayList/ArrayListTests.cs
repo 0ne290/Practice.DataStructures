@@ -1,17 +1,17 @@
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.LinearArray;
+namespace Practice.DataStructures.Tests.Collections.ArrayList;
 
-public sealed class LinearArrayTests
+public sealed class ArrayListTests
 {
     [Fact]
-    public void Constructor_Default_CreatesEmptyArray()
+    public void Constructor_Default_CreatesEmptyList()
     {
         // Arrange
 
         // Act
-        var array = new LinearArray<int>();
+        var array = new ArrayList<int>();
 
         // Assert
         Assert.Equal(0, array.Count);
@@ -22,12 +22,12 @@ public sealed class LinearArrayTests
     [InlineData(1)]
     [InlineData(8)]
     [InlineData(31)]
-    public void Constructor_PositiveCapacity_CreatesEmptyArrayWithRequestedCapacity(int capacity)
+    public void Constructor_PositiveCapacity_CreatesEmptyListWithRequestedCapacity(int capacity)
     {
         // Arrange: capacity is supplied by the theory data.
 
         // Act
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
 
         // Assert
         Assert.Equal(0, array.Count);
@@ -45,7 +45,7 @@ public sealed class LinearArrayTests
         // Act
         Exception? exception = Record.Exception(() =>
         {
-            _ = new LinearArray<int>(capacity);
+            _ = new ArrayList<int>(capacity);
         });
 
         // Assert
@@ -59,7 +59,7 @@ public sealed class LinearArrayTests
     public void Add_AvailableCapacity_AppendsItemWithoutChangingCapacity(int capacity)
     {
         // Arrange
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
         const int item = 42;
 
         // Act
@@ -75,7 +75,7 @@ public sealed class LinearArrayTests
     public void Add_MinimumCapacity_GrowsWhenFull()
     {
         // Arrange
-        var array = new LinearArray<int>(1);
+        var array = new ArrayList<int>(1);
         const int firstItem = 42;
         const int nextItem = 99;
         array.Add(firstItem);
@@ -94,7 +94,7 @@ public sealed class LinearArrayTests
     public void Add_DefaultConstructor_AppendsItem()
     {
         // Arrange
-        var array = new LinearArray<int>();
+        var array = new ArrayList<int>();
         const int item = -42;
 
         // Act
@@ -113,7 +113,7 @@ public sealed class LinearArrayTests
     public void Add_RepeatedGrowth_PreservesOrderAndValues(int initialCapacity)
     {
         // Arrange
-        var array = new LinearArray<int>(initialCapacity);
+        var array = new ArrayList<int>(initialCapacity);
         int[] expected = [.. Enumerable.Range(0, 257).Select(index => index % 17 - 8)];
 
         // Act
@@ -139,7 +139,7 @@ public sealed class LinearArrayTests
     public void Add_IntegerValue_PreservesValue(int item)
     {
         // Arrange
-        var array = new LinearArray<int>();
+        var array = new ArrayList<int>();
         Assert.Empty(array);
 
         // Act
@@ -157,7 +157,7 @@ public sealed class LinearArrayTests
     public void Add_NullableReference_PreservesValue(string? item)
     {
         // Arrange
-        var array = new LinearArray<string?>();
+        var array = new ArrayList<string?>();
         Assert.Empty(array);
 
         // Act
@@ -172,7 +172,7 @@ public sealed class LinearArrayTests
     public void Add_ReferenceValuesWithGrowth_PreservesIdentity()
     {
         // Arrange
-        var array = new LinearArray<object>(1);
+        var array = new ArrayList<object>(1);
         object[] expected = [new(), new(), new()];
 
         // Act
@@ -202,7 +202,7 @@ public sealed class LinearArrayTests
     {
         // Arrange
         const int capacity = 8;
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
         for (int item = 1; item <= count; item++)
         {
             array.Add(item);
@@ -230,11 +230,11 @@ public sealed class LinearArrayTests
     [InlineData(3, 7)]
     [InlineData(3, int.MinValue)]
     [InlineData(3, int.MaxValue)]
-    public void IndexerSet_InvalidIndex_ThrowsWithoutChangingArray(int count, int index)
+    public void IndexerSet_InvalidIndex_ThrowsWithoutChangingList(int count, int index)
     {
         // Arrange
         const int capacity = 8;
-        var array = new LinearArray<int>(capacity);
+        var array = new ArrayList<int>(capacity);
         for (int item = 1; item <= count; item++)
         {
             array.Add(item);
@@ -264,7 +264,7 @@ public sealed class LinearArrayTests
     public void IndexerSet_ValidIndex_ReplacesOnlySelectedItem(int index)
     {
         // Arrange
-        var array = new LinearArray<int>(8);
+        var array = new ArrayList<int>(8);
         int[] expected = [10, 20, 30];
         foreach (int item in expected)
         {

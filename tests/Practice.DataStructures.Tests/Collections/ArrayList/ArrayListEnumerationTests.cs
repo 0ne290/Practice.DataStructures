@@ -2,9 +2,9 @@ using System.Collections;
 using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.LinearArray;
+namespace Practice.DataStructures.Tests.Collections.ArrayList;
 
-public sealed class LinearArrayEnumerationTests
+public sealed class ArrayListEnumerationTests
 {
     [Theory]
     [InlineData(0)]
@@ -14,7 +14,7 @@ public sealed class LinearArrayEnumerationTests
     public void Enumerate_VaryingCounts_YieldsOnlyStoredItemsInOrder(int count)
     {
         // Arrange
-        var array = new LinearArray<int>(8);
+        var array = new ArrayList<int>(8);
         int[] expected = [.. Enumerable.Range(0, count).Select(index => index % 3 - 1)];
         foreach (int item in expected)
         {
@@ -40,7 +40,7 @@ public sealed class LinearArrayEnumerationTests
     public void GetEnumerator_ThroughGenericInterface_RemainsCompletedAfterLastItem()
     {
         // Arrange
-        var array = new LinearArray<int> { 10, 20 };
+        var array = new ArrayList<int> { 10, 20 };
         using IEnumerator<int> iterator = Assert.IsType<IEnumerable<int>>(array, exactMatch: false).GetEnumerator();
         var actual = new List<int>();
 
@@ -61,7 +61,7 @@ public sealed class LinearArrayEnumerationTests
     public void GetEnumerator_ThroughNonGenericInterface_PreservesReferencesAndNull()
     {
         // Arrange
-        var array = new LinearArray<object?>(8);
+        var array = new ArrayList<object?>(8);
         object shared = new();
         object?[] expected = [shared, null, shared, new()];
         foreach (object? item in expected)
@@ -92,7 +92,7 @@ public sealed class LinearArrayEnumerationTests
     public void Enumerate_RepeatedPasses_ReturnsSameSequence()
     {
         // Arrange
-        var array = new LinearArray<int>(1);
+        var array = new ArrayList<int>(1);
         int[] expected = [7, 0, 7, -4];
         foreach (int item in expected)
         {
@@ -112,7 +112,7 @@ public sealed class LinearArrayEnumerationTests
     public void Enumerate_NestedLoops_UseIndependentState()
     {
         // Arrange
-        var array = new LinearArray<int> { 10, 20 };
+        var array = new ArrayList<int> { 10, 20 };
         var actual = new List<(int Outer, int Inner)>();
 
         // Act
@@ -132,7 +132,7 @@ public sealed class LinearArrayEnumerationTests
     public void Enumerate_EarlyBreak_DoesNotAffectNextPass()
     {
         // Arrange
-        var array = new LinearArray<int>();
+        var array = new ArrayList<int>();
         int[] expected = [10, 20, 30];
         foreach (int item in expected)
         {
