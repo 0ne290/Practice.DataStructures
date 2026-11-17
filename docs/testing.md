@@ -12,8 +12,24 @@ Tests содержит проверки публичного API Core, этал�
 
 При начале расширения `ArrayList<T>` используется его существующий Laboratory,
 при начале реализации `CircularArrayList<T>` создаётся один авторский полигон.
+Демонстрация `CircularArrayList<T>`:
+`Collections/CircularArrayList/CircularArrayListLaboratoryTests.cs`.
+Оба этапа ревью завершены; сценарий показывает операции списка, переход через
+границу массива, рост, чтение концов, поиск, перебор, обнаружение изменений,
+ошибки, очистку и повторное использование. Поддерживает новый случайный seed
+и повтор через `DATASTRUCTURES_LAB_SEED`. Запуск:
+
+```powershell
+dotnet test Practice.DataStructures.sln --configuration Release --settings laboratory.runsettings --filter "FullyQualifiedName~CircularArrayListLaboratoryTests" --logger "console;verbosity=detailed"
+```
+
 После двух этапов ревью общий позиционный API проверяется общими контрактными
 тестами; `First` / `Last` и специфические инварианты хранения — отдельно.
+Общие проверки обоих списков находятся в `Collections/ArrayListContract/`:
+тестовые адаптеры прямо отображают публичные операции без изменений Core.
+Специфические проверки `CircularArrayList<T>` находятся в
+`Collections/CircularArrayList/`: малые состояния со всеми смещениями начала
+и позициями, чтение концов, освобождение ячеек и очистка ссылок.
 
 В `Collections/ArrayList/ArrayListTests.cs`
 проверяются создание расширяемого списка на массиве, добавление, рост, доступ по индексу
@@ -361,7 +377,7 @@ dotnet test Practice.DataStructures.sln --configuration Release --settings labor
 dotnet test Practice.DataStructures.sln --configuration Release --settings laboratory.runsettings --filter "Category=Performance" --logger "console;verbosity=detailed"
 ```
 
-Демонстрация `ArrayList<T>` уже доступна в категории Laboratory.
+Демонстрации `ArrayList<T>` и `CircularArrayList<T>` доступны в категории Laboratory.
 Сценариев Performance пока нет; их запуск завершится ошибкой отсутствия тестов.
 
 Лабораторный сценарий вызывает публичный API Core и проверяет результат.
