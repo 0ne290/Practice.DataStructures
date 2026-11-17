@@ -293,6 +293,46 @@ public sealed class ArrayListLaboratoryTests(ITestOutputHelper output)
         Assert.Equal(capacityBeforeRemoval, array.Capacity);
         output.WriteLine($"Повторная очистка пустого списка инвалидировала обход; Add({reusedValue}) снова работает.");
         output.WriteLine("");
+        // Act / Assert: вставка в пустой список, начало, середину и конец, включая рост.
+        output.WriteLine("11. Вставляем элементы по позиции");
+        const int insertionCount = 5;
+        output.WriteLine($"Начальная вместимость для вставок=1; вставок={insertionCount}; диапазон значений=[{minimumValue}, {maximumValue}]");
+        var insertionList = new ArrayList<int>(1);
+        var insertionReference = new List<int>();
+        for (int step = 0; step < insertionCount; step++)
+        {
+            int position = step switch
+            {
+                0 or 1 => 0,
+                2 => insertionList.Count,
+                3 => insertionList.Count / 2,
+                _ => random.Next(insertionList.Count + 1)
+            };
+            int value = random.Next(minimumValue, maximumValue + 1);
+            int previousCapacity = insertionList.Capacity;
+            using IEnumerator<int> iterator = insertionList.GetEnumerator();
+            output.WriteLine($"Insert({position}, {value}); до вставки: [{string.Join(", ", insertionList)}]");
+
+            insertionList.Insert(position, value);
+            insertionReference.Insert(position, value);
+
+            Assert.Equal(insertionReference.Count, insertionList.Count);
+            Assert.Equal(insertionReference, insertionList);
+            Assert.True(insertionList.Capacity >= insertionList.Count);
+            Assert.Throws<InvalidOperationException>(() => iterator.MoveNext());
+            output.WriteLine($"Результат: [{string.Join(", ", insertionList)}]; Count={insertionList.Count}; Capacity={previousCapacity} -> {insertionList.Capacity}; старый обход инвалидирован.");
+        }
+
+        using (IEnumerator<int> iterator = insertionList.GetEnumerator())
+        {
+            ArgumentOutOfRangeException insertionException = Assert.Throws<ArgumentOutOfRangeException>(
+                "index", () => insertionList.Insert(insertionList.Count + 1, 0));
+            Assert.Equal(insertionReference, insertionList);
+            Assert.True(iterator.MoveNext());
+            Assert.Equal(insertionReference[0], iterator.Current);
+            output.WriteLine($"Insert(Count + 1, 0): {insertionException.GetType().Name}; содержимое и обход сохранились.");
+        }
+
         output.WriteLine("Эксперимент завершён. Все проверки пройдены.");
     }
 }

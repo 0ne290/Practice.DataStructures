@@ -3,7 +3,7 @@ using System.Collections;
 namespace Practice.DataStructures.Core.Collections;
 
 /// <summary>
-/// Расширяемый список на массиве с добавлением в конец, доступом и удалением по индексу и перебором элементов.
+/// Расширяемый список на массиве с добавлением в конец, вставкой, доступом и удалением по индексу и перебором элементов.
 /// </summary>
 /// <typeparam name="T">Тип хранимых элементов.</typeparam>
 /// <remarks>
@@ -14,7 +14,7 @@ namespace Practice.DataStructures.Core.Collections;
 /// </para>
 /// <para>
 /// При заполнении хранилища вместимость автоматически увеличивается с сохранением элементов.
-/// Добавление поддерживается только в конец; вставки в произвольную позицию и курсоров нет.
+/// Поддерживаются добавление в конец и вставка по позиции; курсоров нет.
 /// Поиск получает элемент и его текущую позицию; чтение и замена по индексу выполняются напрямую.
 /// Сложность операций указана у соответствующих членов.
 /// </para>
@@ -105,18 +105,55 @@ public sealed class ArrayList<T> : IEnumerable<T>
     /// </remarks>
     public void Add(T item)
     {
-        if (Count >= Capacity)
-        {
-            var newCapacity = Capacity * 2;
-            var newArray = new T[newCapacity];
-            _array.CopyTo(newArray, 0);
-            _array = newArray;
-            Capacity = newCapacity;
-        }
+        EnsureCapacity();
 
         _array[Count] = item;
         Count++;
         _version = unchecked(_version + 1);
+    }
+
+    /// <summary>Вставляет элемент перед указанной позицией, сохраняя порядок остальных элементов.</summary>
+    /// <param name="index">Позиция от нуля до <see cref="Count"/> включительно; Count означает вставку в конец.</param>
+    /// <param name="item">Вставляемый элемент.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="index"/> отрицателен или больше <see cref="Count"/>.
+    /// </exception>
+    /// <exception cref="OutOfMemoryException">Не удалось выделить массив большей вместимости.</exception>
+    /// <remarks>
+    /// Успешная вставка увеличивает Count на один и инвалидирует ранее полученные перечислители.
+    /// При необходимости хранилище автоматически расширяется. Недопустимый индекс не меняет
+    /// содержимое, Count, Capacity и состояние перечислителей. Если выделение нового массива
+    /// не удалось, состояние списка сохраняется.
+    /// Без расширения сложность — O(1 + n − index), дополнительная память — O(1);
+    /// при расширении — O(n) времени и памяти, где n — количество элементов до вставки.
+    /// Вставка в конец имеет амортизированную сложность O(1).
+    /// </remarks>
+    public void Insert(int index, T item)
+    {
+        if (index < 0 || index > Count)
+            throw new ArgumentOutOfRangeException(nameof(index), index, "Index must be between zero and Count, inclusive.");
+
+        EnsureCapacity();
+
+        for (var i = Count - 1; i >= index; i--)
+            _array[i + 1] = _array[i];
+
+        _array[index] = item;
+
+        Count++;
+        _version = unchecked(_version + 1);
+    }
+
+    private void EnsureCapacity()
+    {
+        if (Count < Capacity)
+            return;
+
+        var newCapacity = Capacity * 2;
+        var newArray = new T[newCapacity];
+        _array.CopyTo(newArray, 0);
+        _array = newArray;
+        Capacity = newCapacity;
     }
 
     /// <summary>Удаляет элемент по индексу, сохраняя порядок остальных элементов.</summary>
@@ -224,12 +261,12 @@ public sealed class ArrayList<T> : IEnumerable<T>
     /// </para>
     /// <para>
     /// Версия списка фиксируется при получении перечислителя.
-    /// Успешный вызов <see cref="Add"/>, <see cref="RemoveAt"/>, <see cref="Clear"/> (даже для пустого списка)
+    /// Успешный вызов <see cref="Add"/>, <see cref="Insert"/>, <see cref="RemoveAt"/>, <see cref="Clear"/> (даже для пустого списка)
     /// или запись через индексатор, включая запись того же значения,
     /// инвалидирует ранее полученные перечислители. Их <see cref="IEnumerator.MoveNext"/>
     /// и <see cref="IEnumerator{T}.Current"/> после этого выбрасывают
     /// <see cref="InvalidOperationException"/>, в том числе до первого шага и после завершения обхода.
-    /// Чтение, поиск, отклонённая запись и удаление по недопустимому индексу сохраняют работоспособность перечислителя.
+    /// Чтение, поиск, отклонённая запись, вставка и удаление по недопустимому индексу сохраняют работоспособность перечислителя.
     /// </para>
     /// <para>
     /// <see cref="IEnumerator{T}.Current"/> до первого успешного шага, после завершения
