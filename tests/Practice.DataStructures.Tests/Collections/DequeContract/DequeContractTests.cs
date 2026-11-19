@@ -1,15 +1,16 @@
-using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.Deque;
+namespace Practice.DataStructures.Tests.Collections.DequeContract;
 
-public sealed class ArrayDequeTests
+public abstract class DequeContractTests
 {
+    private protected abstract DequeSubject<T> CreateDeque<T>();
+
     [Fact]
     public void Constructor_NewDeque_IsEmpty()
     {
         // Arrange / Act
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
 
         // Assert
         Assert.Equal(0, deque.Count);
@@ -25,7 +26,7 @@ public sealed class ArrayDequeTests
     public void PushPop_SelectedEnds_PreservesExpectedOrder(bool pushFront, bool popFront)
     {
         // Arrange
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         const int count = 129;
 
         // Act
@@ -60,7 +61,7 @@ public sealed class ArrayDequeTests
     public void PopPeek_EmptyDeque_ThrowsWithoutInvalidatingEnumeration(bool drainFirst)
     {
         // Arrange
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         if (drainFirst)
         {
             deque.PushFront(42);
@@ -80,47 +81,6 @@ public sealed class ArrayDequeTests
         Assert.Equal(7, deque.PopFront());
     }
 
-    [Fact]
-    public void PushPop_RepeatedWrapAndGrowth_MatchesLinkedList()
-    {
-        // Arrange
-        var deque = new ArrayDeque<int>();
-        var expected = new LinkedList<int>();
-
-        // Act / Assert
-        for (int i = 0; i < 1024; i++)
-        {
-            deque.PushBack(i);
-            expected.AddLast(i);
-            if (i % 3 == 0)
-            {
-                Assert.Equal(expected.First?.Value, deque.PopFront());
-                expected.RemoveFirst();
-            }
-            if (i % 5 == 0)
-            {
-                deque.PushFront(-i);
-                expected.AddFirst(-i);
-            }
-            Assert.Equal(expected.ToArray(), deque.ToArray());
-            Assert.Equal(expected.Count, deque.Count);
-        }
-        while (expected.Count > 0)
-        {
-            if (expected.Count % 2 == 0)
-            {
-                Assert.Equal(expected.First?.Value, deque.PopFront());
-                expected.RemoveFirst();
-            }
-            else
-            {
-                Assert.Equal(expected.Last?.Value, deque.PopBack());
-                expected.RemoveLast();
-            }
-        }
-        Assert.Empty(deque);
-    }
-
     [Theory]
     [InlineData(0)]
     [InlineData(12345)]
@@ -129,7 +89,7 @@ public sealed class ArrayDequeTests
     {
         // Arrange
         var random = new Random(seed);
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         var expected = new LinkedList<int>();
 
         // Act / Assert
@@ -188,7 +148,7 @@ public sealed class ArrayDequeTests
     public void PushPop_NullsDuplicatesAndReferences_PreservesIdentity()
     {
         // Arrange
-        var deque = new ArrayDeque<object?>();
+        DequeSubject<object?> deque = CreateDeque<object?>();
         object first = new();
         object second = new();
 
@@ -199,11 +159,75 @@ public sealed class ArrayDequeTests
         deque.PushBack(first);
 
         // Assert
+        Assert.Null(deque.PeekFront());
+        Assert.Same(first, deque.PeekBack());
+        object?[] snapshot = deque.ToArray();
+        Assert.Equal(4, snapshot.Length);
+        Assert.Null(snapshot[0]);
+        Assert.Same(first, snapshot[1]);
+        Assert.Same(second, snapshot[2]);
+        Assert.Same(first, snapshot[3]);
         Assert.Null(deque.PopFront());
         Assert.Same(first, deque.PopBack());
         Assert.Same(second, deque.PopBack());
         Assert.Same(first, deque.PopFront());
         Assert.True(deque.IsEmpty);
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void PushPop_SingleElementAtSelectedEnds_EmptiesAndAllowsReuse(bool pushFront, bool popFront)
+    {
+        // Arrange
+        DequeSubject<int> deque = CreateDeque<int>();
+
+        // Act
+        if (pushFront)
+        {
+            deque.PushFront(0);
+        }
+        else
+        {
+            deque.PushBack(0);
+        }
+
+        // Assert
+        Assert.Equal(1, deque.Count);
+        Assert.False(deque.IsEmpty);
+        Assert.Equal(0, deque.PeekFront());
+        Assert.Equal(0, deque.PeekBack());
+        Assert.Equal(0, popFront ? deque.PopFront() : deque.PopBack());
+        Assert.Equal(0, deque.Count);
+        Assert.True(deque.IsEmpty);
+        Assert.Empty(deque);
+        deque.PushBack(int.MaxValue);
+        deque.PushFront(int.MinValue);
+        Assert.Equal([int.MinValue, int.MaxValue], deque.ToArray());
+        Assert.Equal(int.MaxValue, deque.PopBack());
+        Assert.Equal(int.MinValue, deque.PopFront());
+        Assert.Empty(deque);
+    }
+
+    [Fact]
+    public void PeekPop_SingleNull_TreatsNullAsAnElement()
+    {
+        // Arrange
+        DequeSubject<string?> deque = CreateDeque<string?>();
+        deque.PushFront(null);
+
+        // Act / Assert
+        Assert.Equal(1, deque.Count);
+        Assert.False(deque.IsEmpty);
+        Assert.Null(deque.PeekFront());
+        Assert.Null(deque.PeekBack());
+        Assert.Null(deque.PopBack());
+        Assert.True(deque.IsEmpty);
+        deque.PushBack(null);
+        Assert.Null(deque.PopFront());
+        Assert.Empty(deque);
     }
 
     [Theory]
@@ -213,7 +237,7 @@ public sealed class ArrayDequeTests
     public void Clear_AnySize_RemovesItemsAndAllowsReuse(int count)
     {
         // Arrange
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         for (int i = 0; i < count; i++)
         {
             deque.PushFront(i);

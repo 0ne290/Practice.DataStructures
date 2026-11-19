@@ -1,11 +1,84 @@
 using System.Collections;
-using Practice.DataStructures.Core.Collections;
 using Xunit;
 
-namespace Practice.DataStructures.Tests.Collections.Deque;
+namespace Practice.DataStructures.Tests.Collections.DequeContract;
 
-public sealed class ArrayDequeEnumerationTests
+public abstract class DequeEnumerationContractTests : DequeContractTests
 {
+    [Fact]
+    public void GetEnumerator_UntypedEntry_CapturesVersionAtCreation()
+    {
+        // Arrange
+        DequeSubject<int> deque = CreateDeque<int>();
+        deque.PushBack(7);
+        using var enumerator = (IEnumerator<int>)((IEnumerable)deque).GetEnumerator();
+
+        // Act
+        deque.PushFront(3);
+
+        // Assert
+        Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
+        Assert.Throws<InvalidOperationException>(() => enumerator.Current);
+        Assert.Throws<InvalidOperationException>(() => ((IEnumerator)enumerator).Current);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Dispose_BeforeFirstMove_EndsOnlyThatEnumerator(bool untypedEntry)
+    {
+        // Arrange
+        DequeSubject<int> deque = CreateDeque<int>();
+        deque.PushBack(7);
+        using IEnumerator<int> enumerator = untypedEntry
+            ? (IEnumerator<int>)((IEnumerable)deque).GetEnumerator()
+            : deque.GetEnumerator();
+
+        // Act
+        enumerator.Dispose();
+        enumerator.Dispose();
+
+        // Assert
+        Assert.False(enumerator.MoveNext());
+        Assert.Throws<InvalidOperationException>(() => enumerator.Current);
+        Assert.Throws<InvalidOperationException>(() => ((IEnumerator)enumerator).Current);
+        Assert.Throws<NotSupportedException>(() => enumerator.Reset());
+        Assert.Equal([7], deque.ToArray());
+    }
+
+    [Fact]
+    public void Foreach_EarlyExitAndReferenceElements_PreserveIdentityAndSequence()
+    {
+        // Arrange
+        DequeSubject<object?> deque = CreateDeque<object?>();
+        object item = new();
+        deque.PushBack(item);
+        deque.PushBack(null);
+        deque.PushBack(item);
+
+        // Act
+        foreach (object? value in deque)
+        {
+            Assert.Same(item, value);
+            break;
+        }
+        var snapshot = new List<object?>();
+        foreach (object? value in (IEnumerable)deque)
+        {
+            snapshot.Add(value);
+        }
+
+        // Assert
+        Assert.Equal(3, deque.Count);
+        Assert.Equal(3, snapshot.Count);
+        Assert.Same(item, snapshot[0]);
+        Assert.Null(snapshot[1]);
+        Assert.Same(item, snapshot[2]);
+        Assert.Same(item, deque.PopFront());
+        Assert.Null(deque.PopFront());
+        Assert.Same(item, deque.PopFront());
+    }
+
     public static TheoryData<int, int> ModificationsAndStates
     {
         get
@@ -27,7 +100,7 @@ public sealed class ArrayDequeEnumerationTests
     public void Modification_AnyEnumerationState_InvalidatesBothInterfaces(int modification, int state)
     {
         // Arrange: до начала, на элементе, после конца, после Dispose.
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         deque.PushBack(1);
         deque.PushBack(2);
         using IEnumerator<int> enumerator = deque.GetEnumerator();
@@ -85,7 +158,7 @@ public sealed class ArrayDequeEnumerationTests
     public void Clear_EmptyDeque_InvalidatesEnumerator(bool disposed)
     {
         // Arrange
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         using IEnumerator<int> enumerator = deque.GetEnumerator();
         if (disposed)
         {
@@ -108,7 +181,7 @@ public sealed class ArrayDequeEnumerationTests
     public void Enumeration_AnySize_ValidatesCurrentEndDisposeAndReset(int count)
     {
         // Arrange
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         for (int i = 0; i < count; i++)
         {
             deque.PushBack(i);
@@ -141,7 +214,7 @@ public sealed class ArrayDequeEnumerationTests
     public void Dispose_DuringEnumeration_EndsOnlyThatEnumerator()
     {
         // Arrange
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         deque.PushBack(1);
         deque.PushBack(2);
         using IEnumerator<int> first = deque.GetEnumerator();
@@ -165,7 +238,7 @@ public sealed class ArrayDequeEnumerationTests
     public void ReadsAndNestedForeach_NonEmptyDeque_PreserveEnumerationAndOrder()
     {
         // Arrange
-        var deque = new ArrayDeque<int>();
+        DequeSubject<int> deque = CreateDeque<int>();
         deque.PushBack(2);
         deque.PushFront(1);
         deque.PushBack(3);
