@@ -15,5 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Collections/" />
+    <Folder Include="Trees\" />
   </ItemGroup>
 </Project>
